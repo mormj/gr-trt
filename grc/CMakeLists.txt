@@ -7,5 +7,5 @@
 #
 install(FILES
     trt_infer.block.yml
-    DESTINATION share/gnuradio/grc/blocks
+    trt_fft.block.yml DESTINATION share/gnuradio/grc/blocks
 )

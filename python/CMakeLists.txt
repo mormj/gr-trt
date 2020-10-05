@@ -32,3 +32,4 @@ include(GrTest)
 
 set(GR_TEST_TARGET_DEPS gnuradio-trt)
 GR_ADD_TEST(qa_argmaxv ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_argmaxv.py)
+GR_ADD_TEST(qa_fft ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_fft.py)

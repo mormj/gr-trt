@@ -29,7 +29,7 @@ include(GrPybind)
 ########################################################################
 list(APPEND trt_python_files
     infer_python.cc
-    python_bindings.cc)
+    fft_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(trt 
    ../..

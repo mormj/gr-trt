@@ -19,7 +19,7 @@ include(GrPlatform) #define LIB_SUFFIX
 list(APPEND trt_sources
     logger.cpp
     infer_impl.cc
-    )
+    fft_impl.cc )
 
 set(trt_sources "${trt_sources}" PARENT_SCOPE)
 if(NOT trt_sources)
