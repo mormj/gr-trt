@@ -92,6 +92,7 @@ bool infer_impl::build()
         return false;
     }
 
+
     const auto explicitBatch =
         1U << static_cast<uint32_t>(NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
     auto network = SampleUniquePtr<nvinfer1::INetworkDefinition>(
@@ -99,6 +100,8 @@ bool infer_impl::build()
     if (!network) {
         return false;
     }
+
+
 
     auto config =
         SampleUniquePtr<nvinfer1::IBuilderConfig>(builder->createBuilderConfig());
@@ -122,6 +125,9 @@ bool infer_impl::build()
     if (!d_engine) {
         return false;
     }
+
+
+
 
     assert(network->getNbInputs() == 1);
     d_input_dims = network->getInput(0)->getDimensions();

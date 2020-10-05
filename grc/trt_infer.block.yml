@@ -17,7 +17,7 @@ parameters:
   default: float
 - id: onnx_pathname
   label: ONNX Model
-  dtype: string
+  dtype: file_open
 - id: batch_size
   label: Batch_size
   default: 1

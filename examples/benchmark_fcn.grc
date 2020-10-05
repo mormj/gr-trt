@@ -84,7 +84,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '4'
+    value: '11'
   states:
     bus_sink: false
     bus_source: false
@@ -249,11 +249,11 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    batch_size: '32'
+    batch_size: batch_size
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/fcn.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
     type: float
   states:
     bus_sink: false
