@@ -43,18 +43,8 @@ fft_impl::fft_impl(const size_t fft_size, const size_t batch_size, const bool fo
 
     checkCudaErrors(cufftCreate(&d_plan));
 
-    checkCudaErrors(cufftMakePlanMany(d_plan,
-                                        1,
-                                        &fftSize,
-                                        NULL,
-                                        1,
-                                        1,
-                                        NULL,
-                                        1,
-                                        1,
-                                        CUFFT_C2C,
-                                        d_batch_size,
-                                        &workSize));
+    checkCudaErrors(cufftMakePlanMany(
+        d_plan, 1, &fftSize, NULL, 1, 1, NULL, 1, 1, CUFFT_C2C, d_batch_size, &workSize));
     printf("Temporary buffer size %li bytes\n", workSize);
 
     // checkCudaErrors(cufftPlan1d(&d_plan, d_fft_size, CUFFT_C2C, 1));
@@ -86,7 +76,12 @@ int fft_impl::work(int noutput_items,
         checkCudaErrors(
             cudaMemcpy(d_data, in + s * work_size, mem_size, cudaMemcpyHostToDevice));
 
-        cufftExecC2C(d_plan, d_data, d_data, CUFFT_FORWARD);
+        if (d_forward) {
+            cufftExecC2C(d_plan, d_data, d_data, CUFFT_FORWARD);
+        } else {
+            cufftExecC2C(d_plan, d_data, d_data, CUFFT_INVERSE);
+        }
+
         cudaDeviceSynchronize();
 
         checkCudaErrors(

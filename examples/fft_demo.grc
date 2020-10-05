@@ -317,7 +317,7 @@ blocks:
     batch_size: '128'
     comment: ''
     fft_size: '1024'
-    forward: 'True'
+    forward: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
   states:
