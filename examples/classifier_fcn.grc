@@ -307,7 +307,7 @@ blocks:
     offset: '[]'
     samp_rate: samp_rate
     type: float
-    update_time: '0.10'
+    update_time: '0.02'
     zmax: '1'
     zmin: '-1'
   states:
@@ -349,9 +349,9 @@ blocks:
     entags: 'True'
     grid: 'False'
     gui_hint: ''
-    label1: Signal 1
+    label1: Inferred
     label10: Signal 10
-    label2: Signal 2
+    label2: Actual
     label3: Signal 3
     label4: Signal 4
     label5: Signal 5
@@ -372,7 +372,7 @@ blocks:
     marker9: '-1'
     name: '""'
     nconnections: '2'
-    size: '1000'
+    size: '5000'
     srate: '1'
     stemplot: 'False'
     style1: '1'
@@ -423,7 +423,7 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/VTCNN2.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
     type: float
   states:
     bus_sink: false

@@ -16,7 +16,7 @@ options:
     output_language: python
     placement: (0,0)
     qt_qss_theme: ''
-    realtime_scheduling: ''
+    realtime_scheduling: '1'
     run: 'True'
     run_command: '{python} -u {filename}'
     run_options: run
@@ -48,7 +48,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '"/share/gnuradio/benchmark-dnn/RML2016.10a_forFCN.test.fc32"'
+    value: '"/share/gnuradio/benchmark-dnn/tmp.fc32"'
   states:
     bus_sink: false
     bus_source: false
@@ -141,7 +141,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 172.0]
+    coordinate: [144, 196.0]
     rotation: 0
     state: true
 - name: blocks_null_sink_0
@@ -158,28 +158,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [744, 252.0]
+    coordinate: [864, 248.0]
     rotation: 0
     state: true
-- name: blocks_throttle_0
-  id: blocks_throttle
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    ignoretag: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    samples_per_second: samp_rate
-    type: float
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [256, 268.0]
-    rotation: 0
-    state: bypassed
 - name: import_0
   id: import
   parameters:
@@ -253,19 +234,18 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/VTCNN2.onnx
     type: float
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [504, 236.0]
+    coordinate: [448, 212.0]
     rotation: 0
     state: true
 
 connections:
-- [blocks_file_source_0, '0', blocks_throttle_0, '0']
-- [blocks_throttle_0, '0', trt_infer_0, '0']
+- [blocks_file_source_0, '0', trt_infer_0, '0']
 - [trt_infer_0, '0', blocks_null_sink_0, '0']
 
 metadata:
