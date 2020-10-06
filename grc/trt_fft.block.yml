@@ -1,29 +1,40 @@
 id: trt_fft
 label: fft
-category: '[TensorRT]'
+category: "[TensorRT]"
 templates:
   imports: import trt
-  make: trt.fft(${fft_size}, ${batch_size}, ${forward})
+  make: trt.fft(${fft_size}, ${forward}, ${window}, ${shift}, ${batch_size})
 parameters:
-- id: fft_size
-  label: FFT Size
-  dtype: int
-- id: batch_size
-  label: Batch Size
-  default: '1'
-  dtype: int
-- id: forward
-  label: Forward
-  default: 'true'
-  dtype: bool
+  - id: fft_size
+    label: FFT Size
+    dtype: int
+  - id: forward
+    label: Forward/Reverse
+    dtype: enum
+    options: ["True", "False"]
+    option_labels: [Forward, Reverse]
+  - id: window
+    label: Window
+    dtype: real_vector
+    default: window.blackmanharris(1024)
+  - id: shift
+    label: Shift
+    dtype: enum
+    options: ["True", "False"]
+    option_labels: ["Yes", "No"]
+  - id: batch_size
+    label: Batch Size
+    default: "1"
+    dtype: int
+
 inputs:
-- label: in
-  domain: stream
-  dtype: complex
-  vlen: 1
+  - label: in
+    domain: stream
+    dtype: complex
+    vlen: 1
 outputs:
-- label: out
-  domain: stream
-  dtype: complex
-  vlen: 1
+  - label: out
+    domain: stream
+    dtype: complex
+    vlen: 1
 file_format: 1

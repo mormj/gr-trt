@@ -32,7 +32,11 @@ public:
      * class. trt::fft::make is the public interface for
      * creating new instances.
      */
-    static sptr make(const size_t fft_size, const size_t batch_size=1, const bool forward=true);
+    static sptr make(const size_t fft_size,
+                     const bool forward,
+                     const std::vector<float>& window,
+                     bool shift = false,
+                     const size_t batch_size = 1);
 };
 
 } // namespace trt

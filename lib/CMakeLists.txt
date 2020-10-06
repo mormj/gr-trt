@@ -12,6 +12,23 @@
 find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 
+############################################################################
+#    CUDA Kernels to be compiled with NVCC
+############################################################################
+add_library(gnuradio-trt-cu STATIC 
+fft.cu 
+)
+set_target_properties(gnuradio-trt-cu PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
+# set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_ARCHITECTURES 35)
+
+target_compile_options(gnuradio-trt-cu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_50,code=sm_50>)
+
+
+############################################################################
+
+
 ########################################################################
 # Setup library
 ########################################################################
@@ -28,13 +45,16 @@ if(NOT trt_sources)
 endif(NOT trt_sources)
 
 add_library(gnuradio-trt SHARED ${trt_sources})
-target_link_libraries(gnuradio-trt gnuradio::gnuradio-runtime
+target_link_libraries(gnuradio-trt PUBLIC gnuradio::gnuradio-runtime  
 ${TensorRT_LIBRARY}
 ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
 ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
 ${CUDA_CUFFT_LIBRARIES}
 ${nvonnxparser_LIBRARY}
 )
+target_link_libraries(gnuradio-trt PRIVATE gnuradio-trt-cu
+)
+
 target_include_directories(gnuradio-trt
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
@@ -43,6 +63,8 @@ target_include_directories(gnuradio-trt
   )
 set_target_properties(gnuradio-trt PROPERTIES DEFINE_SYMBOL "gnuradio_trt_EXPORTS")
 target_compile_options(gnuradio-trt PRIVATE -Wno-deprecated-declarations)
+
+
 
 list(APPEND sample_sources
     logger.cpp
@@ -61,16 +83,6 @@ ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
 ${CUDA_CUFFT_LIBRARIES}
 ${nvonnxparser_LIBRARY})
 
-# CUDART_LIB = -lcudart
-# CUDNN_LIB = -lcudnn
-# CUBLAS_LIB = -lcublas
-# MYELIN_LIB = -lmyelin
-# NVINFER_LIB = -lnvinfer
-# NVPARSERS_LIB = -lnvparsers
-# NVINFER_PLUGIN_LIB = -lnvinfer_plugin
-# NVONNXPARSERS_LIB = -lnvonnxparser
-
-
 if(APPLE)
     set_target_properties(gnuradio-trt PROPERTIES
         INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
@@ -81,7 +93,10 @@ endif(APPLE)
 # Install built library files
 ########################################################################
 include(GrMiscUtils)
+
+install( TARGETS gnuradio-trt-cu EXPORT gnuradio-trt-cu-export )
 GR_LIBRARY_FOO(gnuradio-trt)
+
 
 ########################################################################
 # Print summary

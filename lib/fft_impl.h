@@ -20,16 +20,25 @@ class fft_impl : public fft
 {
 private:
     size_t d_fft_size;
-    size_t d_batch_size;
     bool d_forward;
+    std::vector<float> d_window;
+    bool d_shift;
+    size_t d_batch_size;
+    
 
     cufftHandle d_plan;
     cufftComplex *d_data;
+    cufftComplex *d_data2;
+    float *d_window_dev;
     
 
 
 public:
-    fft_impl(const size_t fft_size, const size_t batch_size, const bool forward);
+    fft_impl(const size_t fft_size,
+                     const bool forward,
+                     const std::vector<float>& window,
+                     bool shift = false,
+                     const size_t batch_size = 1);
     ~fft_impl();
 
     // Where all the action really happens

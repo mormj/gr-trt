@@ -3,3 +3,4 @@ examples/*.py
 *.fc32
 *.dat
 **/.vscode
+tmp/

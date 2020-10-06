@@ -10,34 +10,57 @@
 
 #include <helper_cuda.h>
 
+extern void apply_window(cuFloatComplex* in, float* window, int fft_size, int batch_size);
+
 namespace gr {
 namespace trt {
 
 using input_type = gr_complex;
 using output_type = gr_complex;
-fft::sptr fft::make(const size_t fft_size, const size_t batch_size, const bool forward)
+fft::sptr fft::make(const size_t fft_size,
+                    const bool forward,
+                    const std::vector<float>& window,
+                    bool shift,
+                    const size_t batch_size)
 {
-    return gnuradio::make_block_sptr<fft_impl>(fft_size, batch_size, forward);
+    return gnuradio::make_block_sptr<fft_impl>(
+        fft_size, forward, window, shift, batch_size);
 }
 
 
 /*
  * The private constructor
  */
-fft_impl::fft_impl(const size_t fft_size, const size_t batch_size, const bool forward)
+fft_impl::fft_impl(const size_t fft_size,
+                   const bool forward,
+                   const std::vector<float>& window,
+                   bool shift,
+                   const size_t batch_size)
     : gr::sync_block(
           "fft",
           gr::io_signature::make(1, 1 /* min, max nr of inputs */, sizeof(input_type)),
           gr::io_signature::make(1, 1 /* min, max nr of outputs */, sizeof(output_type))),
       d_fft_size(fft_size),
-      d_batch_size(batch_size),
-      d_forward(forward)
+      d_forward(forward),
+      d_window(window),
+      d_shift(shift),
+      d_batch_size(batch_size)
+
 {
 
     checkCudaErrors(
         cudaMalloc((void**)&d_data, sizeof(cufftComplex) * d_fft_size * d_batch_size));
-    // cufftPlanMany(&plan, 1, d_fft_size, &iembed, istride, idist,
-    //     &oembed, ostride, odist, CUFFT_C2C, BATCH);
+
+    checkCudaErrors(
+        cudaMalloc((void**)&d_window_dev, sizeof(float) * d_fft_size * d_batch_size));
+
+    for (auto i = 0; i < d_batch_size; i++) {
+        checkCudaErrors(cudaMemcpy(d_window_dev + i * d_fft_size,
+                                   &window[0],
+                                   d_fft_size * sizeof(float),
+                                   cudaMemcpyHostToDevice));
+    }
+
     size_t workSize;
     int fftSize = d_fft_size;
 
@@ -59,6 +82,7 @@ fft_impl::~fft_impl()
 {
     cufftDestroy(d_plan);
     cudaFree(d_data);
+    cudaFree(d_window_dev);
 }
 
 int fft_impl::work(int noutput_items,
@@ -73,8 +97,18 @@ int fft_impl::work(int noutput_items,
     auto mem_size = work_size * sizeof(gr_complex);
 
     for (auto s = 0; s < nvecs; s++) {
+
+        cuFloatComplex* tmp_float;
+        cudaHostAlloc(
+            (void**)&tmp_float, 2 * d_fft_size * d_batch_size * sizeof(float), 0);
+
         checkCudaErrors(
             cudaMemcpy(d_data, in + s * work_size, mem_size, cudaMemcpyHostToDevice));
+
+
+        apply_window(d_data, d_window_dev, d_fft_size, d_batch_size);
+        cudaDeviceSynchronize();
+
 
         if (d_forward) {
             cufftExecC2C(d_plan, d_data, d_data, CUFFT_FORWARD);

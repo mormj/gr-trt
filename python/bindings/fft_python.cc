@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(fft.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(b1c9257fd0d1bc69132fd4b12d85e52b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(1002b6c00a443910d9edc51817e77188)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -38,8 +38,10 @@ void bind_fft(py::module& m)
 
         .def(py::init(&fft::make),
            py::arg("fft_size"),
+           py::arg("forward"),
+           py::arg("window"),
+           py::arg("shift") = false,
            py::arg("batch_size") = 1,
-           py::arg("forward") = true,
            D(fft,make)
         )
         
