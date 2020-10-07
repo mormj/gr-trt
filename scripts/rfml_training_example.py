@@ -11,9 +11,11 @@ import numpy as np
 import torch.nn.functional as F
 from torchvision import datasets
 from torchvision import transforms
+from random import shuffle
 
 
 # In[2]:
+
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -44,10 +46,12 @@ print(X.shape)
 np.random.seed(2019)
 n_examples = X.shape[0]
 n_train = int(round(n_examples * 0.5))
-train_idx = np.random.choice(range(0, n_examples), size=n_train, replace=False)
-test_idx = list(set(range(0, n_examples))-set(train_idx))
-X_train = X[train_idx]
-X_test = X[test_idx]
+
+
+# train_idx = np.random.choice(range(0, n_examples), size=n_train, replace=False)
+# test_idx = list(set(range(0, n_examples))-set(train_idx))
+# X_train = X[train_idx]
+# X_test = X[test_idx]
 
 
 # In[5]:
@@ -57,24 +61,22 @@ def to_onehot(yy):
     yy1[np.arange(len(yy)), yy] = 1  # ?
     return yy1
 
-cls_train = torch.LongTensor(list(map(lambda x: mods.index(lbl[x][0]), train_idx))).to(DEVICE)
-cls_test = torch.LongTensor(list(map(lambda x: mods.index(lbl[x][0]), test_idx))).to(DEVICE)
+lbl = np.array([mods.index(x[0]) for x in lbl])
 
-Y_train = torch.Tensor(to_onehot(list(map(lambda x: mods.index(lbl[x][0]), train_idx)))).to(DEVICE)
-Y_test = torch.Tensor(to_onehot(list(map(lambda x: mods.index(lbl[x][0]), test_idx)))).to(DEVICE)
+idx = list(range(len(lbl)))
+shuffle(idx)
 
+X_train = X[idx[:n_train]]
+Y_train = lbl[idx[:n_train]]
 
-# In[6]:
+X_test = X[idx[n_train:]]
+Y_test = lbl[idx[n_train:]]
 
-
-in_shp = list(X_train.shape[1:])
-print(X_train.shape, in_shp)
-classes = mods
-
-nsamples = X_train.shape[0]
 
 X_train = torch.Tensor(X_train).to(DEVICE)
+Y_train = torch.LongTensor(Y_train).to(DEVICE)
 X_test = torch.Tensor(X_test).to(DEVICE)
+Y_test = torch.LongTensor(Y_test).to(DEVICE)
 
 
 # In[7]:
@@ -92,7 +94,7 @@ class VTCNN2(nn.Module):
         self.flat = nn.Flatten()
         self.dense1 = nn.Linear(10560, 256)
         self.dense2 = nn.Linear(256, 11)
-        self.sm = nn.Softmax(dim=1)
+        # self.sm = nn.Softmax(dim=1)
 
     def forward(self, x):
         x = x/x.max()
@@ -103,7 +105,7 @@ class VTCNN2(nn.Module):
         x = self.flat(x)
         x = self.drop3(F.relu(self.dense1(x)))
         x = self.dense2(x)
-        x = self.sm(x)
+        # x = self.sm(x)
         return x
 
 class FCN(nn.Module):
@@ -137,7 +139,7 @@ def train():
         batch = min(batch_size, nsamples-current_sample)
         xx = X_train[current_sample:(current_sample+batch)]
         yy = Y_train[current_sample:(current_sample+batch)]
-        zz = cls_train[current_sample:(current_sample+batch)]
+        # yy = cls_train[current_sample:(current_sample+batch)]
         # Before the backward pass, use the optimizer object to zero all of the
         # gradients for the variables it will update (which are the learnable
         # weights of the model). This is because by default, gradients are
@@ -179,14 +181,14 @@ def test(epoch):
             batch = min(batch_size, nsamples-current_sample)
             xx = X_test[current_sample:(current_sample+batch)]
             yy = Y_test[current_sample:(current_sample+batch)]
-            zz = cls_test[current_sample:(current_sample+batch)]
+            # zz = cls_test[current_sample:(current_sample+batch)]
 
             output = net(xx)
             
             test_loss += loss_fn(output, yy.long()).item()  # sum up batch loss
             pred = output.argmax(dim=1)  # get the index of the max log-probability
             # correct += pred.eq(yy).sum().item()
-            correct += pred.eq(zz).sum().item()
+            correct += pred.eq(yy).sum().item()
             current_sample += batch
 
 
@@ -199,8 +201,8 @@ def test(epoch):
 
 # In[ ]:
 
-# loss_fn = nn.CrossEntropyLoss()
-loss_fn = nn.MSELoss(reduction='sum')
+loss_fn = nn.CrossEntropyLoss()
+# loss_fn = nn.MSELoss(reduction='sum')
 
 model = VTCNN2().to(DEVICE)
 # model = FCN().to(DEVICE)
@@ -208,7 +210,7 @@ print(model)
 batch_size = 1024
 learning_rate = 1e-3
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-n_epochs = 10
+n_epochs = 100
 
 for t in range(n_epochs):
     train()
