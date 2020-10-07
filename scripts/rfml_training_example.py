@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from torchvision import datasets
 from torchvision import transforms
 from random import shuffle
+import matplotlib.pyplot as plt
 
 
 # In[2]:
@@ -20,18 +21,18 @@ from random import shuffle
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 Xd = pickle.load(open("RML2016.10a_dict.pkl", 'rb'), encoding='latin1')
-test_snrs, mods = map(lambda j: sorted(
+snrs, mods = map(lambda j: sorted(
     list(set(map(lambda x: x[j], Xd.keys())))), [1, 0])
 X = []
 lbl = []
-test_snrs =  [10,12,14,16,18]
+snrs =  [10,12,14,16,18]
 # test_snrs =  [18]
 
 # In[3]:
 
 
 for mod in mods:
-    for snr in test_snrs:
+    for snr in snrs:
         # interleave I and Q
         X.append(Xd[(mod, snr)].transpose((0,2,1)).reshape((-1,256))  )
         for i in range(Xd[(mod, snr)].shape[0]):
@@ -61,17 +62,19 @@ def to_onehot(yy):
     yy1[np.arange(len(yy)), yy] = 1  # ?
     return yy1
 
-lbl = np.array([mods.index(x[0]) for x in lbl])
+modidx = np.array([mods.index(x[0]) for x in lbl])
+snr = np.array([x[1] for x in lbl])
 
-idx = list(range(len(lbl)))
+idx = list(range(len(modidx)))
 shuffle(idx)
 
 X_train = X[idx[:n_train]]
-Y_train = lbl[idx[:n_train]]
+Y_train = modidx[idx[:n_train]]
+snr_train = snr[idx[:n_train]]
 
 X_test = X[idx[n_train:]]
-Y_test = lbl[idx[n_train:]]
-
+Y_test = modidx[idx[n_train:]]
+snr_test = snr[idx[n_train:]]
 
 X_train = torch.Tensor(X_train).to(DEVICE)
 Y_train = torch.LongTensor(Y_train).to(DEVICE)
@@ -87,13 +90,17 @@ class VTCNN2(nn.Module):
         super(VTCNN2, self).__init__()
         # self.reshape = torch.reshape((nsamples, 1, X_train.shape[1], X_train.shape[2]))
         self.conv1 = nn.Conv2d(1,256,(1,3),padding=(0,2))
+        # nn.init.xavier_uniform_(self.conv1.weight, gain=1.0)
         self.drop1 = nn.Dropout(dr)
         self.drop2 = nn.Dropout(dr)
         self.drop3 = nn.Dropout(dr)
         self.conv2 = nn.Conv2d(256,80,(2,3),padding=(0,2))
+        # nn.init.xavier_uniform_(self.conv2.weight, gain=1.0)
         self.flat = nn.Flatten()
         self.dense1 = nn.Linear(10560, 256)
+        # nn.init.kaiming_normal_(self.dense1.weight)
         self.dense2 = nn.Linear(256, 11)
+        # nn.init.kaiming_normal_(self.dense2.weight)
         # self.sm = nn.Softmax(dim=1)
 
     def forward(self, x):
@@ -120,11 +127,13 @@ class FCN(nn.Module):
         self.sm = nn.Softmax()
 
     def forward(self, x):
+        x = x/x.max()
         x = self.relu1(self.dense1(x))
         x = self.dense2(x)
         x = self.dense3(x)
         x = self.dense4(x)
-        x = self.sm(self.dense5(x))
+        x = self.dense5(x)
+        # x = self.sm(x)
         return x
 
 
@@ -199,6 +208,25 @@ def test(epoch):
         100. * correct / nsamples))
 
 
+def predict(X_test):
+    net = model.eval()
+    correct = 0
+    nsamples = X_test.shape[0]
+    ret = []
+    with torch.no_grad():
+        current_sample = 0
+        while(current_sample < nsamples):
+            batch = min(batch_size, nsamples-current_sample)
+            xx = X_test[current_sample:(current_sample+batch)]
+            yy = Y_test[current_sample:(current_sample+batch)]
+
+            output = net(xx)
+            ret += output.argmax(dim=1)
+            current_sample += batch
+            
+    return ret
+
+
 # In[ ]:
 
 loss_fn = nn.CrossEntropyLoss()
@@ -215,7 +243,6 @@ n_epochs = 100
 for t in range(n_epochs):
     train()
     test(t)
-    
 
 # In[ ]:
 
@@ -224,3 +251,65 @@ ONNX_FILE_PATH = model._get_name() + '.onnx'
 torch.onnx.export(model, dummy_input, ONNX_FILE_PATH, input_names=['input'],
                   output_names=['output'], export_params=True)
 
+
+def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues, labels=[]):
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(labels))
+    plt.xticks(tick_marks, labels, rotation=45)
+    plt.yticks(tick_marks, labels)
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+
+classes = mods
+# Plot confusion matrix
+test_Y_hat = predict(X_test)
+conf = np.zeros([len(classes),len(classes)])
+confnorm = np.zeros([len(classes),len(classes)])
+for i in range(0,X_test.shape[0]):
+    j = int(Y_test[i])
+    k = int(test_Y_hat[i])
+    conf[j,k] = conf[j,k] + 1
+for i in range(0,len(classes)):
+    confnorm[i,:] = conf[i,:] / np.sum(conf[i,:])
+plot_confusion_matrix(confnorm, labels=classes)
+
+# Save the test sets
+X_test.cpu().numpy().astype(np.float32).tofile('RML2016.10a.test.fc32')
+Y_test.cpu().numpy().astype(np.int16).tofile('RML2016.10a.test.lbl')
+
+# Plot confusion matrix
+acc = {}
+for snr in snrs:
+
+    # extract classes @ SNR
+    test_X_i = X_test[np.where(snr_test==snr)]
+    test_Y_i = Y_test[np.where(snr_test==snr)]    
+
+    # estimate classes
+    test_Y_i_hat = predict(test_X_i)
+    conf = np.zeros([len(classes),len(classes)])
+    confnorm = np.zeros([len(classes),len(classes)])
+    for i in range(0,test_X_i.shape[0]):
+        j = int(test_Y_i[i])
+        k = int(test_Y_i_hat[i])
+        conf[j,k] = conf[j,k] + 1
+    for i in range(0,len(classes)):
+        confnorm[i,:] = conf[i,:] / np.sum(conf[i,:])
+    plt.figure()
+    plot_confusion_matrix(confnorm, labels=classes, title="ConvNet Confusion Matrix (SNR=%d)"%(snr))
+    
+    cor = np.sum(np.diag(conf))
+    ncor = np.sum(conf) - cor
+    print("Overall Accuracy: ", cor / (cor+ncor))
+    acc[snr] = 1.0*cor/(cor+ncor)
+
+    # Save the test sets per SNR
+    test_X_i.cpu().numpy().astype(np.float32).tofile('RML2016.10a.test_snr={}.fc32'.format(snr))
+    test_Y_i.cpu().numpy().astype(np.int16).tofile('RML2016.10a.test_snr={}.lbl'.format(snr))
+
+
+plt.show()

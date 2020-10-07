@@ -61,7 +61,7 @@ bool infer_impl::constructNetwork(SampleUniquePtr<nvinfer1::IBuilder>& builder,
         return false;
     }
 
-    config->setMaxWorkspaceSize(1024_MiB);
+    config->setMaxWorkspaceSize(2_GiB);
     if (d_fp16) {
         config->setFlag(BuilderFlag::kFP16);
     }

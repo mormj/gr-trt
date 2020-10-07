@@ -414,6 +414,22 @@ blocks:
     coordinate: [912, 444.0]
     rotation: 0
     state: enabled
+- name: trt_confusion_matrix_0
+  id: trt_confusion_matrix
+  parameters:
+    affinity: ''
+    alias: ''
+    class_labels: '[''8PSK'', ''AM-DSB'', ''AM-SSB'', ''BPSK'', ''CPFSK'', ''GFSK'',
+      ''PAM4'', ''QAM16'', ''QAM64'', ''QPSK'', ''WBFM'']'
+    comment: ''
+    gui_hint: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [864, 592.0]
+    rotation: 0
+    state: true
 - name: trt_infer_0
   id: trt_infer
   parameters:
@@ -423,7 +439,7 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/_VTCNN2.onnx
     type: float
   states:
     bus_sink: false
@@ -435,9 +451,11 @@ blocks:
 
 connections:
 - [blocks_argmax_xx_0, '0', blocks_short_to_float_0, '0']
+- [blocks_argmax_xx_0, '0', trt_confusion_matrix_0, '0']
 - [blocks_argmax_xx_0, '1', blocks_null_sink_0, '0']
 - [blocks_file_source_0, '0', blocks_throttle_0, '0']
 - [blocks_file_source_0_0, '0', blocks_short_to_float_0_0, '0']
+- [blocks_file_source_0_0, '0', trt_confusion_matrix_0, '1']
 - [blocks_short_to_float_0, '0', qtgui_time_sink_x_0_0, '0']
 - [blocks_short_to_float_0_0, '0', qtgui_time_sink_x_0_0, '1']
 - [blocks_stream_to_vector_0, '0', blocks_argmax_xx_0, '0']

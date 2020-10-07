@@ -22,7 +22,7 @@ add_subdirectory(bindings)
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    DESTINATION ${GR_PYTHON_DIR}/trt
+    confusion_matrix.py DESTINATION ${GR_PYTHON_DIR}/trt
 )
 
 ########################################################################

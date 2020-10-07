@@ -20,4 +20,5 @@ except ImportError:
     pass
 
 # import any pure python here
+from .confusion_matrix import confusion_matrix
 #

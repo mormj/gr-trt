@@ -4,3 +4,4 @@ examples/*.py
 *.dat
 **/.vscode
 tmp/
+**/__pycache__

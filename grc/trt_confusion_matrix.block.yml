@@ -1,0 +1,53 @@
+id: trt_confusion_matrix
+label: confusion_matrix
+category: "[TensorRT]"
+
+templates:
+  imports: import trt
+  # make: trt.confusion_matrix(${class_labels})
+  make: |-
+    <%
+        win = '_confusion_matrix_%s'%id
+    %>\
+    ${win} = trt.confusion_matrix(${class_labels})
+    self.${id} = ${win}
+
+    ${gui_hint() % win}
+
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+parameters:
+  - id: class_labels
+    label: "Class Labels"
+    dtype: raw
+  - id: gui_hint
+    label: GUI Hint
+    dtype: gui_hint
+    hide: part
+#- id: ...
+#  label: ...
+#  dtype: ...
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+  - label: pred
+    domain: stream
+    dtype: short
+  #  vlen: ...
+  #  optional: ...
+  - label: actual
+    domain: stream
+    dtype: short
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1
