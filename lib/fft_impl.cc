@@ -97,14 +97,8 @@ int fft_impl::work(int noutput_items,
     auto mem_size = work_size * sizeof(gr_complex);
 
     for (auto s = 0; s < nvecs; s++) {
-
-        cuFloatComplex* tmp_float;
-        cudaHostAlloc(
-            (void**)&tmp_float, 2 * d_fft_size * d_batch_size * sizeof(float), 0);
-
         checkCudaErrors(
             cudaMemcpy(d_data, in + s * work_size, mem_size, cudaMemcpyHostToDevice));
-
 
         apply_window(d_data, d_window_dev, d_fft_size, d_batch_size);
         cudaDeviceSynchronize();
