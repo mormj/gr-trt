@@ -32,7 +32,7 @@ public:
      * class. trt::infer::make is the public interface for
      * creating new instances.
      */
-    static sptr make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size=1);
+    static sptr make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size=1, uint64_t workspace_size=(1<<30), int dla_core = -1);
 };
 
 } // namespace trt

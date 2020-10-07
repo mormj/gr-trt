@@ -15,9 +15,9 @@ namespace trt {
 using input_type = float;
 using output_type = float;
 infer::sptr
-infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size)
+infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, uint64_t workspace_size, int dla_core)
 {
-    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, batch_size);
+    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, batch_size, workspace_size, dla_core);
 }
 
 
@@ -26,14 +26,18 @@ infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size
  */
 infer_impl::infer_impl(const std::string& onnx_pathname,
                        size_t itemsize,
-                       size_t batch_size)
+                       size_t batch_size,
+                       uint64_t workspace_size,
+                       int dla_core)
     : gr::block(
           "infer",
           gr::io_signature::make(1, 1 /* min, max nr of inputs */, sizeof(input_type)),
           gr::io_signature::make(1, 1 /* min, max nr of outputs */, sizeof(output_type))),
       d_onnx_pathname(onnx_pathname),
       d_engine(nullptr),
-      d_batch_size(batch_size)
+      d_batch_size(batch_size),
+      d_workspace_size(workspace_size),
+      d_dla_core(dla_core)
 {
     build();
 
@@ -61,7 +65,8 @@ bool infer_impl::constructNetwork(SampleUniquePtr<nvinfer1::IBuilder>& builder,
         return false;
     }
 
-    config->setMaxWorkspaceSize(2_GiB);
+    // config->setMaxWorkspaceSize(2_GiB);
+    config->setMaxWorkspaceSize(d_workspace_size);
     if (d_fp16) {
         config->setFlag(BuilderFlag::kFP16);
     }

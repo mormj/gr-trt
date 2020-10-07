@@ -36,6 +36,7 @@ private:
         d_engine; //!< The TensorRT engine used to run the network
     std::string d_onnx_pathname;
     int32_t d_batch_size;
+    uint64_t d_workspace_size;
 
     std::shared_ptr<samplesCommon::BufferManager> d_buffers;
     SampleUniquePtr<nvinfer1::IExecutionContext> d_context;
@@ -59,7 +60,7 @@ private:
                           SampleUniquePtr<nvonnxparser::IParser>& parser);
 
 public:
-    infer_impl(const std::string& onnx_pathname, size_t itemsize, size_t batch_size);
+    infer_impl(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, uint64_t workspace_size, int dla_core);
     ~infer_impl();
 
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);
