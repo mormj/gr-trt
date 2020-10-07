@@ -15,9 +15,9 @@ namespace trt {
 using input_type = float;
 using output_type = float;
 infer::sptr
-infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, uint64_t workspace_size, int dla_core)
+infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, memory_model_t memory_model, uint64_t workspace_size, int dla_core)
 {
-    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, batch_size, workspace_size, dla_core);
+    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, batch_size, memory_model, workspace_size, dla_core);
 }
 
 
@@ -27,6 +27,7 @@ infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size
 infer_impl::infer_impl(const std::string& onnx_pathname,
                        size_t itemsize,
                        size_t batch_size,
+                       memory_model_t memory_model, 
                        uint64_t workspace_size,
                        int dla_core)
     : gr::block(
@@ -36,6 +37,7 @@ infer_impl::infer_impl(const std::string& onnx_pathname,
       d_onnx_pathname(onnx_pathname),
       d_engine(nullptr),
       d_batch_size(batch_size),
+      d_memory_model(memory_model),
       d_workspace_size(workspace_size),
       d_dla_core(dla_core)
 {

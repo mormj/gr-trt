@@ -14,6 +14,8 @@
 namespace gr {
 namespace trt {
 
+enum class memory_model_t { TRADITIONAL = 0, PINNED, UNIFIED };
+
 /*!
  * \brief <+description of block+>
  * \ingroup trt
@@ -32,7 +34,12 @@ public:
      * class. trt::infer::make is the public interface for
      * creating new instances.
      */
-    static sptr make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size=1, uint64_t workspace_size=(1<<30), int dla_core = -1);
+    static sptr make(const std::string& onnx_pathname,
+                     size_t itemsize,
+                     size_t batch_size = 1,
+                     memory_model_t memory_model = memory_model_t::TRADITIONAL,
+                     uint64_t workspace_size = (1 << 30),
+                     int dla_core = -1);
 };
 
 } // namespace trt

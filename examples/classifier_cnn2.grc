@@ -398,10 +398,11 @@ blocks:
     comment: ''
     dla_core: '-1'
     maxoutbuf: '0'
+    memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL.onnx
     type: float
-    workspace_size: 1073741824*2
+    workspace_size: 1073741824*1
   states:
     bus_sink: false
     bus_source: false

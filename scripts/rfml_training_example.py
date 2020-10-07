@@ -137,6 +137,27 @@ class FCN(nn.Module):
         return x
 
 
+class FCNSMALL(nn.Module):
+    def __init__(self):
+        super(FCNSMALL, self).__init__()
+        self.dense1 = nn.Linear(256, 512)
+        self.relu1 = nn.ReLU()
+        self.dense2 = nn.Linear(512, 64)
+        self.dense3 = nn.Linear(64, 32)
+        self.dense4 = nn.Linear(32, 16)
+        self.dense5 = nn.Linear(16, 11)
+        # self.sm = nn.Softmax()
+
+    def forward(self, x):
+        x = x/x.max()
+        x = self.relu1(self.dense1(x))
+        x = self.dense2(x)
+        x = self.dense3(x)
+        x = self.dense4(x)
+        x = self.dense5(x)
+        # x = self.sm(x)
+        return x
+
 # In[13]:
 
 
@@ -232,8 +253,9 @@ def predict(X_test):
 loss_fn = nn.CrossEntropyLoss()
 # loss_fn = nn.MSELoss(reduction='sum')
 
-model = VTCNN2().to(DEVICE)
+# model = VTCNN2().to(DEVICE)
 # model = FCN().to(DEVICE)
+model = FCNSMALL().to(DEVICE)
 print(model)
 batch_size = 1024
 learning_rate = 1e-3

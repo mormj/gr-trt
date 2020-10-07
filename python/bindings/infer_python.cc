@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(infer.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(a858fa387a4d94a69836b5c15d0fc140)                     */
+/* BINDTOOL_HEADER_FILE_HASH(c45cbf3138d7faf8f5092658bccfa15d)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -30,34 +30,29 @@ namespace py = pybind11;
 void bind_infer(py::module& m)
 {
 
-    using infer    = ::gr::trt::infer;
+    using infer = ::gr::trt::infer;
 
+    py::enum_<::gr::trt::memory_model_t>(m, "memory_model_t")
+        .value("TRADITIONAL", ::gr::trt::memory_model_t::TRADITIONAL) // 0
+        .value("PINNED", ::gr::trt::memory_model_t::PINNED)           // 1
+        .value("UNIFIED", ::gr::trt::memory_model_t::UNIFIED)         // 2
+        .export_values();
 
-    py::class_<infer, gr::block, gr::basic_block,
-        std::shared_ptr<infer>>(m, "infer", D(infer))
+    py::class_<infer, gr::block, gr::basic_block, std::shared_ptr<infer>>(
+        m, "infer", D(infer))
 
         .def(py::init(&infer::make),
-           py::arg("onnx_pathname"),
-           py::arg("itemsize"),
-           py::arg("batch_size") = 1,
-           py::arg("workspace_size") = (1 << 30),
-           py::arg("dla_core") = -1,
-           D(infer,make)
-        )
-        
-
+             py::arg("onnx_pathname"),
+             py::arg("itemsize"),
+             py::arg("batch_size") = 1,
+             py::arg("memory_model") = ::gr::trt::memory_model_t::TRADITIONAL,
+             py::arg("workspace_size") = (1 << 30),
+             py::arg("dla_core") = -1,
+             D(infer, make))
 
 
         ;
 
-
-
+    py::implicitly_convertible<int, ::gr::trt::memory_model_t>();
 
 }
-
-
-
-
-
-
-
