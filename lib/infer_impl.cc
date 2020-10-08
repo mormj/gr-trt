@@ -107,7 +107,7 @@ bool infer_impl::build()
     if (!network) {
         return false;
     }
-
+    builder->setMaxBatchSize(d_batch_size);
 
 
     auto config =
@@ -134,8 +134,6 @@ bool infer_impl::build()
     }
 
 
-
-
     assert(network->getNbInputs() == 1);
     d_input_dims = network->getInput(0)->getDimensions();
     // assert(d_input_dims.nbDims == 4);
@@ -151,18 +149,12 @@ bool infer_impl::build()
 
     d_input_vlen = d_inputH * d_inputW;
     d_output_vlen = d_outputH * d_outputW;
-
-    // Create RAII buffer manager object
-    d_buffers = std::make_shared<samplesCommon::BufferManager>(d_engine);
-
+    
     d_context =
         SampleUniquePtr<nvinfer1::IExecutionContext>(d_engine->createExecutionContext());
     if (!d_context) {
         return false;
     }
-
-    d_input_buffer = static_cast<float*>(d_buffers->getHostBuffer("input"));
-    d_output_buffer = static_cast<float*>(d_buffers->getHostBuffer("output"));
 
     auto nb = d_engine->getNbBindings();
     for (auto i = 0; i < nb; i++) {
@@ -178,8 +170,50 @@ bool infer_impl::build()
         }
         vol *= samplesCommon::volume(dims);
 
-        d_device_buffers.emplace_back(vol, type);
-        d_device_bindings.emplace_back(d_device_buffers[i].data());
+        void *ptr;
+        switch(d_memory_model)
+        {
+            case memory_model_t::TRADITIONAL:
+                // Input memory will be explicitly set to device memory
+                
+                if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
+                    return false;
+                if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
+                    return false;
+
+                d_device_bindings.emplace_back(ptr);
+            break;
+
+            case memory_model_t::PINNED:
+
+                // Input memory will be copied into pinned shared memory
+
+                if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) == cudaSuccess )
+                    return false;
+                if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) == cudaSuccess )
+                    return false;
+
+                d_device_bindings.emplace_back(ptr);
+
+            break;
+
+            case memory_model_t::UNIFIED:
+
+                // Use unified memory constructs
+
+                if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
+                    return false;
+                if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
+                    return false;
+
+                d_device_bindings.emplace_back(ptr);
+
+            break;
+
+            default:
+                throw std::runtime_error("Invalid Memory Model Specified");
+        }
+
     }
     return true;
 }
@@ -217,20 +251,23 @@ int infer_impl::general_work(int noutput_items,
 
         // Memcpy from host input buffers to device input buffers
         // d_buffers->copyInputToDevice();
-        cudaMemcpy(d_device_buffers[0].data(),
+        cudaMemcpy(d_device_bindings[0],
                    in + b * in_sz,
                    in_sz * sizeof(float),
                    cudaMemcpyHostToDevice);
 
-        bool status = d_context->executeV2(d_device_bindings.data());
+        // bool status = d_context->executeV2(d_device_bindings.data());
+        bool status = d_context->execute(d_batch_size, d_device_bindings.data());
         if (!status) {
             return false;
         }
+        cudaDeviceSynchronize();
 
         cudaMemcpy(out + b * out_sz,
-                   d_device_buffers[1].data(),
+                   d_device_bindings[1],
                    out_sz * sizeof(float),
                    cudaMemcpyDeviceToHost);
+        
     }
 
     consume_each(ni);

@@ -273,7 +273,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 220.0]
+    coordinate: [352, 220.0]
     rotation: 0
     state: bypassed
 - name: qtgui_time_sink_x_0_0
@@ -400,9 +400,9 @@ blocks:
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
     type: float
-    workspace_size: 1073741824*1
+    workspace_size: 1073741824*2
   states:
     bus_sink: false
     bus_source: false

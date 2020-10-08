@@ -42,13 +42,6 @@ private:
     std::shared_ptr<samplesCommon::BufferManager> d_buffers;
     SampleUniquePtr<nvinfer1::IExecutionContext> d_context;
 
-    float* d_input_buffer = nullptr;
-    float* d_output_buffer = nullptr;
-
-    samplesCommon::DeviceBuffer d_input_dev_buffer;
-    samplesCommon::DeviceBuffer d_output_dev_buffer;
-
-    std::vector<samplesCommon::DeviceBuffer> d_device_buffers;
     std::vector<void*> d_device_bindings;
 
     int d_inputH, d_outputH, d_inputW, d_outputW;
