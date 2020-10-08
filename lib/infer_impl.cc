@@ -265,7 +265,12 @@ int infer_impl::general_work(int noutput_items,
                        in + b * in_sz,
                        in_sz * sizeof(float),
                        cudaMemcpyHostToDevice);
+        } else {
+            memcpy(d_device_bindings[0],
+                       in + b * in_sz,
+                       in_sz * sizeof(float));
         }
+
 
         bool status = d_context->executeV2(d_device_bindings.data());
         // bool status = d_context->execute(d_batch_size, d_device_bindings.data());
@@ -279,6 +284,8 @@ int infer_impl::general_work(int noutput_items,
                        d_device_bindings[1],
                        out_sz * sizeof(float),
                        cudaMemcpyDeviceToHost);
+        } else {
+            memcpy(out + b * out_sz, d_device_bindings[1], out_sz * sizeof(float));
         }
     }
 

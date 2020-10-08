@@ -438,7 +438,7 @@ blocks:
     comment: ''
     dla_core: '-1'
     maxoutbuf: '0'
-    memory_model: trt.memory_model_t.UNIFIED
+    memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
     onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL_1.onnx
     type: float
