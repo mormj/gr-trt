@@ -15,9 +15,9 @@ namespace trt {
 using input_type = float;
 using output_type = float;
 infer::sptr
-infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, memory_model_t memory_model, uint64_t workspace_size, int dla_core)
+infer::make(const std::string& onnx_pathname, size_t itemsize, memory_model_t memory_model, uint64_t workspace_size, int dla_core)
 {
-    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, batch_size, memory_model, workspace_size, dla_core);
+    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, memory_model, workspace_size, dla_core);
 }
 
 
@@ -26,7 +26,6 @@ infer::make(const std::string& onnx_pathname, size_t itemsize, size_t batch_size
  */
 infer_impl::infer_impl(const std::string& onnx_pathname,
                        size_t itemsize,
-                       size_t batch_size,
                        memory_model_t memory_model, 
                        uint64_t workspace_size,
                        int dla_core)
@@ -36,14 +35,13 @@ infer_impl::infer_impl(const std::string& onnx_pathname,
           gr::io_signature::make(1, 1 /* min, max nr of outputs */, sizeof(output_type))),
       d_onnx_pathname(onnx_pathname),
       d_engine(nullptr),
-      d_batch_size(batch_size),
       d_memory_model(memory_model),
       d_workspace_size(workspace_size),
       d_dla_core(dla_core)
 {
     build();
 
-    set_output_multiple(d_output_vlen * d_batch_size);
+    set_output_multiple(d_output_vlen);
 }
 
 //!
@@ -99,7 +97,6 @@ bool infer_impl::build()
         return false;
     }
 
-
     const auto explicitBatch =
         1U << static_cast<uint32_t>(NetworkDefinitionCreationFlag::kEXPLICIT_BATCH);
     auto network = SampleUniquePtr<nvinfer1::INetworkDefinition>(
@@ -107,8 +104,8 @@ bool infer_impl::build()
     if (!network) {
         return false;
     }
-    builder->setMaxBatchSize(d_batch_size);
-
+    
+    
 
     auto config =
         SampleUniquePtr<nvinfer1::IBuilderConfig>(builder->createBuilderConfig());
@@ -133,7 +130,7 @@ bool infer_impl::build()
         return false;
     }
 
-
+    std::cout << "Max Batch Size: " << d_engine->getMaxBatchSize() << std::endl;
     assert(network->getNbInputs() == 1);
     d_input_dims = network->getInput(0)->getDimensions();
     // assert(d_input_dims.nbDims == 4);
@@ -161,7 +158,9 @@ bool infer_impl::build()
         auto type = d_engine->getBindingDataType(i);
         auto dims = d_context->getBindingDimensions(i);
         int vecDim = d_engine->getBindingVectorizedDim(i);
-        size_t vol = d_context || !d_batch_size ? 1 : static_cast<size_t>(d_batch_size);
+        // size_t vol = d_context || !d_batch_size ? 1 : static_cast<size_t>(d_batch_size);
+        size_t vol = 1; // ONNX Parser only supports explicit batch which means it is baked into the model
+        // size_t vol = d_batch_size;
         if (-1 != vecDim) // i.e., 0 != lgScalarsPerVector
         {
             int scalarsPerVec = d_engine->getBindingComponentsPerElement(i);
@@ -239,8 +238,8 @@ int infer_impl::general_work(int noutput_items,
     const input_type* in = reinterpret_cast<const input_type*>(input_items[0]);
     output_type* out = reinterpret_cast<output_type*>(output_items[0]);
 
-    int in_sz = d_input_vlen * d_batch_size;
-    int out_sz = d_output_vlen * d_batch_size;
+    int in_sz = d_input_vlen; // * d_batch_size;
+    int out_sz = d_output_vlen; // * d_batch_size;
 
     auto num_batches = noutput_items / out_sz;
     auto ni = num_batches * in_sz;
@@ -256,8 +255,8 @@ int infer_impl::general_work(int noutput_items,
                    in_sz * sizeof(float),
                    cudaMemcpyHostToDevice);
 
-        // bool status = d_context->executeV2(d_device_bindings.data());
-        bool status = d_context->execute(d_batch_size, d_device_bindings.data());
+        bool status = d_context->executeV2(d_device_bindings.data());
+        // bool status = d_context->execute(d_batch_size, d_device_bindings.data());
         if (!status) {
             return false;
         }

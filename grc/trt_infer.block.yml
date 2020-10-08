@@ -3,7 +3,7 @@ label: infer
 category: '[TensorRT]'
 templates:
   imports: import trt
-  make: trt.infer(${onnx_pathname}, ${type.size}, ${batch_size}, ${memory_model}, ${workspace_size}, ${dla_core})
+  make: trt.infer(${onnx_pathname}, ${type.size}, ${memory_model}, ${workspace_size}, ${dla_core})
 
 parameters:
 - id: type
@@ -18,10 +18,6 @@ parameters:
 - id: onnx_pathname
   label: ONNX Model
   dtype: file_open
-- id: batch_size
-  label: Batch Size
-  default: 1
-  dtype: int
 - id: memory_model
   label: Memory Model
   dtype: enum

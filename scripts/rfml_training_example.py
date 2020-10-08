@@ -260,7 +260,7 @@ print(model)
 batch_size = 1024
 learning_rate = 1e-3
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-n_epochs = 100
+n_epochs = 50
 
 for t in range(n_epochs):
     train()
@@ -268,10 +268,12 @@ for t in range(n_epochs):
 
 # In[ ]:
 
-dummy_input = torch.randn(1, 256, device='cuda')
-ONNX_FILE_PATH = model._get_name() + '.onnx'
-torch.onnx.export(model, dummy_input, ONNX_FILE_PATH, input_names=['input'],
-                  output_names=['output'], export_params=True)
+for i in [1,2,4,8,16,32]:
+    dummy_input = torch.randn(i, 256, device='cuda')
+    ONNX_FILE_PATH = model._get_name() + '_' + str(i) + '.onnx'
+    print('Saving {}'.format(ONNX_FILE_PATH))
+    torch.onnx.export(model, dummy_input, ONNX_FILE_PATH, input_names=['input'],
+                    output_names=['output'], export_params=True)
 
 
 def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues, labels=[]):

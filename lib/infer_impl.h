@@ -54,7 +54,7 @@ private:
                           SampleUniquePtr<nvonnxparser::IParser>& parser);
 
 public:
-    infer_impl(const std::string& onnx_pathname, size_t itemsize, size_t batch_size, memory_model_t memory_model, uint64_t workspace_size, int dla_core);
+    infer_impl(const std::string& onnx_pathname, size_t itemsize, memory_model_t memory_model, uint64_t workspace_size, int dla_core);
     ~infer_impl();
 
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);

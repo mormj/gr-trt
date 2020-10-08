@@ -435,12 +435,14 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    batch_size: '1'
     comment: ''
+    dla_core: '-1'
     maxoutbuf: '0'
+    memory_model: trt.memory_model_t.TRADITIONAL
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/_VTCNN2.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL_32.onnx
     type: float
+    workspace_size: '1073741824'
   states:
     bus_sink: false
     bus_source: false

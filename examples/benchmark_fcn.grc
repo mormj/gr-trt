@@ -230,13 +230,12 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    batch_size: batch_size
     comment: ''
     dla_core: '-1'
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.UNIFIED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL_8.onnx
     type: float
     workspace_size: '1073741824'
   states:
