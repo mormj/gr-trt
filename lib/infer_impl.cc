@@ -14,10 +14,14 @@ namespace trt {
 
 using input_type = float;
 using output_type = float;
-infer::sptr
-infer::make(const std::string& onnx_pathname, size_t itemsize, memory_model_t memory_model, uint64_t workspace_size, int dla_core)
+infer::sptr infer::make(const std::string& onnx_pathname,
+                        size_t itemsize,
+                        memory_model_t memory_model,
+                        uint64_t workspace_size,
+                        int dla_core)
 {
-    return gnuradio::make_block_sptr<infer_impl>(onnx_pathname, itemsize, memory_model, workspace_size, dla_core);
+    return gnuradio::make_block_sptr<infer_impl>(
+        onnx_pathname, itemsize, memory_model, workspace_size, dla_core);
 }
 
 
@@ -26,7 +30,7 @@ infer::make(const std::string& onnx_pathname, size_t itemsize, memory_model_t me
  */
 infer_impl::infer_impl(const std::string& onnx_pathname,
                        size_t itemsize,
-                       memory_model_t memory_model, 
+                       memory_model_t memory_model,
                        uint64_t workspace_size,
                        int dla_core)
     : gr::block(
@@ -104,8 +108,7 @@ bool infer_impl::build()
     if (!network) {
         return false;
     }
-    
-    
+
 
     auto config =
         SampleUniquePtr<nvinfer1::IBuilderConfig>(builder->createBuilderConfig());
@@ -146,7 +149,7 @@ bool infer_impl::build()
 
     d_input_vlen = d_inputH * d_inputW;
     d_output_vlen = d_outputH * d_outputW;
-    
+
     d_context =
         SampleUniquePtr<nvinfer1::IExecutionContext>(d_engine->createExecutionContext());
     if (!d_context) {
@@ -158,8 +161,10 @@ bool infer_impl::build()
         auto type = d_engine->getBindingDataType(i);
         auto dims = d_context->getBindingDimensions(i);
         int vecDim = d_engine->getBindingVectorizedDim(i);
-        // size_t vol = d_context || !d_batch_size ? 1 : static_cast<size_t>(d_batch_size);
-        size_t vol = 1; // ONNX Parser only supports explicit batch which means it is baked into the model
+        // size_t vol = d_context || !d_batch_size ? 1 :
+        // static_cast<size_t>(d_batch_size);
+        size_t vol = 1; // ONNX Parser only supports explicit batch which means it is
+                        // baked into the model
         // size_t vol = d_batch_size;
         if (-1 != vecDim) // i.e., 0 != lgScalarsPerVector
         {
@@ -169,50 +174,54 @@ bool infer_impl::build()
         }
         vol *= samplesCommon::volume(dims);
 
-        void *ptr;
-        switch(d_memory_model)
-        {
-            case memory_model_t::TRADITIONAL:
-                // Input memory will be explicitly set to device memory
-                
-                if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
-                    return false;
-                if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
-                    return false;
+        void* ptr;
+        switch (d_memory_model) {
+        case memory_model_t::TRADITIONAL:
+            // Input memory will be explicitly set to device memory
 
-                d_device_bindings.emplace_back(ptr);
+            if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) ==
+                cudaSuccess)
+                return false;
+            if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) ==
+                cudaSuccess)
+                return false;
+
+            d_device_bindings.emplace_back(ptr);
             break;
 
-            case memory_model_t::PINNED:
+        case memory_model_t::PINNED:
 
-                // Input memory will be copied into pinned shared memory
+            // Input memory will be copied into pinned shared memory
 
-                if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) == cudaSuccess )
-                    return false;
-                if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) == cudaSuccess )
-                    return false;
+            if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) ==
+                cudaSuccess)
+                return false;
+            if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) ==
+                cudaSuccess)
+                return false;
 
-                d_device_bindings.emplace_back(ptr);
-
-            break;
-
-            case memory_model_t::UNIFIED:
-
-                // Use unified memory constructs
-
-                if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
-                    return false;
-                if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) == cudaSuccess )
-                    return false;
-
-                d_device_bindings.emplace_back(ptr);
+            d_device_bindings.emplace_back(ptr);
 
             break;
 
-            default:
-                throw std::runtime_error("Invalid Memory Model Specified");
+        case memory_model_t::UNIFIED:
+
+            // Use unified memory constructs
+
+            if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) ==
+                cudaSuccess)
+                return false;
+            if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) ==
+                cudaSuccess)
+                return false;
+
+            d_device_bindings.emplace_back(ptr);
+
+            break;
+
+        default:
+            throw std::runtime_error("Invalid Memory Model Specified");
         }
-
     }
     return true;
 }
@@ -238,7 +247,7 @@ int infer_impl::general_work(int noutput_items,
     const input_type* in = reinterpret_cast<const input_type*>(input_items[0]);
     output_type* out = reinterpret_cast<output_type*>(output_items[0]);
 
-    int in_sz = d_input_vlen; // * d_batch_size;
+    int in_sz = d_input_vlen;   // * d_batch_size;
     int out_sz = d_output_vlen; // * d_batch_size;
 
     auto num_batches = noutput_items / out_sz;
@@ -250,10 +259,13 @@ int infer_impl::general_work(int noutput_items,
 
         // Memcpy from host input buffers to device input buffers
         // d_buffers->copyInputToDevice();
-        cudaMemcpy(d_device_bindings[0],
-                   in + b * in_sz,
-                   in_sz * sizeof(float),
-                   cudaMemcpyHostToDevice);
+
+        if (d_memory_model == memory_model_t::TRADITIONAL) {
+            cudaMemcpy(d_device_bindings[0],
+                       in + b * in_sz,
+                       in_sz * sizeof(float),
+                       cudaMemcpyHostToDevice);
+        }
 
         bool status = d_context->executeV2(d_device_bindings.data());
         // bool status = d_context->execute(d_batch_size, d_device_bindings.data());
@@ -262,11 +274,12 @@ int infer_impl::general_work(int noutput_items,
         }
         cudaDeviceSynchronize();
 
-        cudaMemcpy(out + b * out_sz,
-                   d_device_bindings[1],
-                   out_sz * sizeof(float),
-                   cudaMemcpyDeviceToHost);
-        
+        if (d_memory_model == memory_model_t::TRADITIONAL) {
+            cudaMemcpy(out + b * out_sz,
+                       d_device_bindings[1],
+                       out_sz * sizeof(float),
+                       cudaMemcpyDeviceToHost);
+        }
     }
 
     consume_each(ni);
