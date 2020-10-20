@@ -21,6 +21,7 @@ namespace py = pybind11;
 /* Please do not delete
 /**************************************/
 // BINDING_FUNCTION_PROTOTYPES(
+    void bind_memmodel(py::module& m);
     void bind_infer(py::module& m);
     void bind_fft(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
@@ -51,6 +52,7 @@ PYBIND11_MODULE(trt_python, m)
     /* Please do not delete
     /**************************************/
     // BINDING_FUNCTION_CALLS(
+    bind_memmodel(m);
     bind_infer(m);
     bind_fft(m);
     // ) END BINDING_FUNCTION_CALLS

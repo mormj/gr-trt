@@ -10,11 +10,11 @@
 
 #include <gnuradio/sync_block.h>
 #include <trt/api.h>
+#include <trt/memmodel.h>
 
 namespace gr {
 namespace trt {
 
-enum class memory_model_t { TRADITIONAL = 0, PINNED, UNIFIED };
 
 /*!
  * \brief <+description of block+>

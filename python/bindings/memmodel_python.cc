@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(infer.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(4243a978b54156afa017e7b91e320774)                     */
+/* BINDTOOL_HEADER_FILE(memmodel.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(767273a1929a842582f3c1f85797d8b7)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,35 +23,22 @@
 
 namespace py = pybind11;
 
-#include <trt/infer.h>
+#include <trt/memmodel.h>
 // pydoc.h is automatically generated in the build directory
-#include <infer_pydoc.h>
+#include <memmodel_pydoc.h>
 
-void bind_infer(py::module& m)
+void bind_memmodel(py::module& m)
 {
 
-    using infer    = ::gr::trt::infer;
 
+    py::enum_<::gr::trt::memory_model_t>(m,"memory_model_t")
+        .value("TRADITIONAL", ::gr::trt::memory_model_t::TRADITIONAL) // 0
+        .value("PINNED", ::gr::trt::memory_model_t::PINNED) // 1
+        .value("UNIFIED", ::gr::trt::memory_model_t::UNIFIED) // 2
+        .export_values()
+    ;
 
-    py::class_<infer, gr::block, gr::basic_block,
-        std::shared_ptr<infer>>(m, "infer", D(infer))
-
-        .def(py::init(&infer::make),
-           py::arg("onnx_pathname"),
-           py::arg("itemsize"),
-           py::arg("memory_model") = ::gr::trt::memory_model_t::TRADITIONAL,
-           py::arg("workspace_size") = (1 << 30),
-           py::arg("dla_core") = -1,
-           D(infer,make)
-        )
-        
-
-
-
-        ;
-
-
-
+    py::implicitly_convertible<int, ::gr::trt::memory_model_t>();
 
 }
 

@@ -171,7 +171,7 @@ blocks:
     bus_structure: null
     coordinate: [24, 300.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_null_sink_0
   id: blocks_null_sink
   parameters:
@@ -189,6 +189,25 @@ blocks:
     coordinate: [696, 432.0]
     rotation: 0
     state: true
+- name: blocks_null_source_0
+  id: blocks_null_source
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_source: '[[0,],]'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_outputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [88, 192.0]
+    rotation: 0
+    state: disabled
 - name: blocks_short_to_float_0
   id: blocks_short_to_float
   parameters:
@@ -239,6 +258,26 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [344, 400.0]
+    rotation: 0
+    state: true
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: float
+    vector: list(range(256))
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [56, 444.0]
     rotation: 0
     state: true
 - name: epy_block_0
@@ -373,6 +412,79 @@ blocks:
     coordinate: [912, 444.0]
     rotation: 0
     state: enabled
+- name: qtgui_vector_sink_f_0
+  id: qtgui_vector_sink_f
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'True'
+    average: '1.0'
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    grid: 'False'
+    gui_hint: ''
+    label1: ''
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
+    ref_level: '0'
+    showports: 'False'
+    update_time: '0.10'
+    vlen: output_len
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    x_axis_label: '"x-Axis"'
+    x_start: '0'
+    x_step: '1.0'
+    x_units: '""'
+    y_axis_label: '"y-Axis"'
+    y_units: '""'
+    ymax: '10'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1048, 172.0]
+    rotation: 0
+    state: true
 - name: trt_confusion_matrix_0
   id: trt_confusion_matrix
   parameters:
@@ -394,13 +506,12 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    batch_size: '1'
     comment: ''
     dla_core: '-1'
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCN.onnx
+    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL_1.onnx
     type: float
     workspace_size: 1073741824*2
   states:
@@ -418,9 +529,12 @@ connections:
 - [blocks_file_source_0_0, '0', blocks_short_to_float_0_0, '0']
 - [blocks_file_source_0_0, '0', trt_confusion_matrix_0, '1']
 - [blocks_file_source_0_1, '0', epy_block_0, '0']
+- [blocks_null_source_0, '0', epy_block_0, '0']
 - [blocks_short_to_float_0, '0', qtgui_time_sink_x_0_0, '0']
 - [blocks_short_to_float_0_0, '0', qtgui_time_sink_x_0_0, '1']
 - [blocks_stream_to_vector_0, '0', blocks_argmax_xx_0, '0']
+- [blocks_stream_to_vector_0, '0', qtgui_vector_sink_f_0, '0']
+- [blocks_vector_source_x_0, '0', epy_block_0, '0']
 - [epy_block_0, '0', trt_infer_0, '0']
 - [trt_infer_0, '0', blocks_stream_to_vector_0, '0']
 

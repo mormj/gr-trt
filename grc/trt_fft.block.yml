@@ -3,7 +3,7 @@ label: fft
 category: "[TensorRT]"
 templates:
   imports: import trt
-  make: trt.fft(${fft_size}, ${forward}, ${window}, ${shift}, ${batch_size})
+  make: trt.fft(${fft_size}, ${forward}, ${window}, ${shift}, ${batch_size}, ${memory_model})
 parameters:
   - id: fft_size
     label: FFT Size
@@ -26,15 +26,21 @@ parameters:
     label: Batch Size
     default: "1"
     dtype: int
+  - id: memory_model
+    label: Memory Model
+    dtype: enum
+    default: trt.memory_model_t.TRADITIONAL
+    options: [trt.memory_model_t.TRADITIONAL, trt.memory_model_t.PINNED, trt.memory_model_t.UNIFIED]
+    option_labels: ['Traditional', 'Pinned', 'Unified']
 
 inputs:
   - label: in
     domain: stream
     dtype: complex
-    vlen: 1
+    vlen: ${fft_size}
 outputs:
   - label: out
     domain: stream
     dtype: complex
-    vlen: 1
+    vlen: ${fft_size}
 file_format: 1

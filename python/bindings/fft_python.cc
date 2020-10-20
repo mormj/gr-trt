@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(fft.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(1002b6c00a443910d9edc51817e77188)                     */
+/* BINDTOOL_HEADER_FILE_HASH(629094349a2978aed8c4f2e2f1531d2d)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -42,6 +42,7 @@ void bind_fft(py::module& m)
            py::arg("window"),
            py::arg("shift") = false,
            py::arg("batch_size") = 1,
+           py::arg("mem_model") = ::gr::trt::memory_model_t::TRADITIONAL,
            D(fft,make)
         )
         

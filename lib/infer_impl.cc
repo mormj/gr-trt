@@ -235,8 +235,9 @@ infer_impl::~infer_impl() {}
 
 void infer_impl::forecast(int noutput_items, gr_vector_int& ninput_items_required)
 {
-    int nb = noutput_items / d_output_vlen;
-    ninput_items_required[0] = nb * d_input_vlen;
+    ninput_items_required[0] = ( noutput_items * d_input_vlen ) / d_output_vlen;
+
+    // std::cout << "Forecast: " << noutput_items << " / " << ninput_items_required[0] << std::endl;
 }
 
 int infer_impl::general_work(int noutput_items,
@@ -244,6 +245,7 @@ int infer_impl::general_work(int noutput_items,
                              gr_vector_const_void_star& input_items,
                              gr_vector_void_star& output_items)
 {
+    // std::cout << "work" << std::endl;
     const input_type* in = reinterpret_cast<const input_type*>(input_items[0]);
     output_type* out = reinterpret_cast<output_type*>(output_items[0]);
 
@@ -289,9 +291,11 @@ int infer_impl::general_work(int noutput_items,
         }
     }
 
+    // std::cout << "consumed " << ni << std::endl;
     consume_each(ni);
 
     // Tell runtime system how many output items we produced.
+    // std::cout << "produced " << noutput_items << std::endl;
     return noutput_items;
 }
 

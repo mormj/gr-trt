@@ -24,7 +24,7 @@ private:
     std::vector<float> d_window;
     bool d_shift;
     size_t d_batch_size;
-    
+    memory_model_t d_mem_model;
 
     cufftHandle d_plan;
     cufftComplex *d_data;
@@ -38,7 +38,8 @@ public:
                      const bool forward,
                      const std::vector<float>& window,
                      bool shift = false,
-                     const size_t batch_size = 1);
+                     const size_t batch_size = 1,
+                     const memory_model_t mem_model = memory_model_t::TRADITIONAL);
     ~fft_impl();
 
     // Where all the action really happens

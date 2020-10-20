@@ -28,6 +28,7 @@ include(GrPybind)
 # Python Bindings
 ########################################################################
 list(APPEND trt_python_files
+    memmodel_python.cc
     infer_python.cc
     fft_python.cc python_bindings.cc)
 
