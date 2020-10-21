@@ -32,6 +32,18 @@ options:
     state: enabled
 
 blocks:
+- name: actual_samples
+  id: variable
+  parameters:
+    comment: ''
+    value: (fft_size * batch_size) * int (nsamples / (fft_size * batch_size))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [208, 68.0]
+    rotation: 0
+    state: enabled
 - name: batch_size
   id: variable
   parameters:
@@ -48,7 +60,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '1024'
+    value: '4'
   states:
     bus_sink: false
     bus_source: false
@@ -60,12 +72,12 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '10000000'
+    value: '1000000'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 20.0]
+    coordinate: [208, 4.0]
     rotation: 0
     state: enabled
 - name: blocks_head_0
@@ -76,14 +88,14 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    num_items: int(nsamples / 1024)
+    num_items: int(nsamples / fft_size)
     type: complex
-    vlen: '1024'
+    vlen: fft_size
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [336, 156.0]
+    coordinate: [416, 156.0]
     rotation: 0
     state: enabled
 - name: blocks_null_sink_0
@@ -95,14 +107,14 @@ blocks:
     comment: ''
     num_inputs: '1'
     type: complex
-    vlen: '1024'
+    vlen: fft_size
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [484.0, 352]
     rotation: 270
-    state: disabled
+    state: enabled
 - name: blocks_null_source_0
   id: blocks_null_source
   parameters:
@@ -114,14 +126,14 @@ blocks:
     minoutbuf: '0'
     num_outputs: '1'
     type: complex
-    vlen: '1024'
+    vlen: fft_size
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 84.0]
+    coordinate: [216, 132.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: blocks_stream_to_vector_0
   id: blocks_stream_to_vector
   parameters:
@@ -139,7 +151,7 @@ blocks:
     bus_structure: null
     coordinate: [240, 224.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: blocks_vector_source_x_0
   id: blocks_vector_source_x
   parameters:
@@ -159,7 +171,7 @@ blocks:
     bus_structure: null
     coordinate: [24, 172.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: import_0
   id: import
   parameters:
@@ -193,15 +205,15 @@ blocks:
     code: 'self.endt = time.time()
 
 
-      meas_tput = self.nsamples / (self.endt-self.startt)
+      meas_tput = self.actual_samples / (self.endt-self.startt)
 
       print( "{} MSamps / sec, {}, {}".format(meas_tput/1e6, self.nsamples, self.endt-self.startt
       ))
 
 
-      d = self.vs1.data()
+      #d = self.vs1.data()
 
-      print(d[0:100])'
+      #print(d[0:100])'
     comment: ''
     priority: '0'
     section: main_after_stop
@@ -236,10 +248,10 @@ blocks:
     alias: ''
     batch_size: batch_size
     comment: ''
-    fft_size: '1024'
+    fft_size: fft_size
     forward: 'True'
     maxoutbuf: '0'
-    memory_model: trt.memory_model_t.PINNED
+    memory_model: trt.memory_model_t.TRADITIONAL
     minoutbuf: '0'
     shift: 'False'
     window: window.blackmanharris(1024)
@@ -247,7 +259,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [504, 124.0]
+    coordinate: [600, 124.0]
     rotation: 0
     state: true
 - name: trt_fft_0_0
@@ -257,7 +269,7 @@ blocks:
     alias: ''
     batch_size: batch_size
     comment: ''
-    fft_size: '1024'
+    fft_size: fft_size
     forward: 'False'
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.TRADITIONAL
@@ -270,7 +282,7 @@ blocks:
     bus_structure: null
     coordinate: [872, 124.0]
     rotation: 0
-    state: bypassed
+    state: enabled
 - name: trt_fft_0_1
   id: trt_fft
   parameters:
@@ -278,7 +290,7 @@ blocks:
     alias: ''
     batch_size: batch_size
     comment: ''
-    fft_size: '1024'
+    fft_size: fft_size
     forward: 'False'
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.TRADITIONAL
@@ -291,7 +303,7 @@ blocks:
     bus_structure: null
     coordinate: [872, 260.0]
     rotation: 180
-    state: bypassed
+    state: enabled
 - name: trt_fft_0_2
   id: trt_fft
   parameters:
@@ -299,7 +311,7 @@ blocks:
     alias: ''
     batch_size: batch_size
     comment: ''
-    fft_size: '1024'
+    fft_size: fft_size
     forward: 'True'
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.TRADITIONAL
@@ -312,7 +324,7 @@ blocks:
     bus_structure: null
     coordinate: [600, 268.0]
     rotation: 180
-    state: bypassed
+    state: enabled
 - name: vs1
   id: blocks_vector_sink_x
   parameters:
@@ -328,7 +340,7 @@ blocks:
     bus_structure: null
     coordinate: [424.0, 352]
     rotation: 270
-    state: true
+    state: disabled
 
 connections:
 - [blocks_head_0, '0', trt_fft_0, '0']

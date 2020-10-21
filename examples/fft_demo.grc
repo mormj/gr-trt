@@ -84,7 +84,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [160, 308.0]
+    coordinate: [56, 308.0]
     rotation: 0
     state: true
 - name: blocks_complex_to_mag_squared_0
@@ -119,6 +119,24 @@ blocks:
     coordinate: [1080, 384.0]
     rotation: 0
     state: true
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: window.blackmanharris(1024)
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1024'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [416, 228.0]
+    rotation: 0
+    state: enabled
 - name: blocks_nlog10_ff_0
   id: blocks_nlog10_ff
   parameters:
@@ -170,7 +188,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [360, 352.0]
+    coordinate: [312, 352.0]
     rotation: 0
     state: true
 - name: blocks_vector_to_stream_0
@@ -332,7 +350,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    batch_size: '1024'
+    batch_size: '1'
     comment: ''
     fft_size: '1024'
     forward: 'True'
@@ -345,7 +363,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [632, 84.0]
+    coordinate: [664, 52.0]
     rotation: 0
     state: true
 
@@ -353,10 +371,11 @@ connections:
 - [analog_sig_source_x_0, '0', blocks_stream_to_vector_0, '0']
 - [blocks_complex_to_mag_squared_0, '0', blocks_nlog10_ff_0, '0']
 - [blocks_complex_to_mag_squared_0_0, '0', blocks_nlog10_ff_0_0, '0']
+- [blocks_multiply_const_vxx_0, '0', trt_fft_0, '0']
 - [blocks_nlog10_ff_0, '0', qtgui_time_sink_x_0, '0']
 - [blocks_nlog10_ff_0_0, '0', qtgui_time_sink_x_0, '1']
+- [blocks_stream_to_vector_0, '0', blocks_multiply_const_vxx_0, '0']
 - [blocks_stream_to_vector_0, '0', fft_vxx_0, '0']
-- [blocks_stream_to_vector_0, '0', trt_fft_0, '0']
 - [blocks_vector_to_stream_0, '0', blocks_complex_to_mag_squared_0_0, '0']
 - [blocks_vector_to_stream_0_0, '0', blocks_complex_to_mag_squared_0, '0']
 - [fft_vxx_0, '0', blocks_vector_to_stream_0, '0']

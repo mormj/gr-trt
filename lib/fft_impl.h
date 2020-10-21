@@ -27,10 +27,7 @@ private:
     memory_model_t d_mem_model;
 
     cufftHandle d_plan;
-    cufftComplex *d_data;
-    cufftComplex *d_data2;
-    float *d_window_dev;
-    
+    cufftComplex *d_data;   
 
 
 public:
