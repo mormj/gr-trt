@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2020 gr-trt author.
+ * Copyright 2020 Perspecta Labs, Inc.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -13,7 +13,7 @@
 #include <NvInfer.h>
 #include <cuda_runtime_api.h>
 
-#include "buffers.h"
+// #include "buffers.h"
 #include "common.h"
 #include "logger.h"
 #include "parserOnnxConfig.h"
@@ -39,7 +39,6 @@ private:
     uint64_t d_workspace_size;
     memory_model_t d_memory_model;
 
-    std::shared_ptr<samplesCommon::BufferManager> d_buffers;
     SampleUniquePtr<nvinfer1::IExecutionContext> d_context;
 
     std::vector<void*> d_device_bindings;

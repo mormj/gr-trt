@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2020 gr-trt author.
+ * Copyright 2020 Perspecta Labs, Inc.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -256,11 +256,6 @@ int infer_impl::general_work(int noutput_items,
     auto ni = num_batches * in_sz;
 
     for (auto b = 0; b < num_batches; b++) {
-
-        // memcpy(d_input_buffer, in, noutput_items * sizeof(float));
-
-        // Memcpy from host input buffers to device input buffers
-        // d_buffers->copyInputToDevice();
 
         if (d_memory_model == memory_model_t::TRADITIONAL) {
             cudaMemcpy(d_device_bindings[0],

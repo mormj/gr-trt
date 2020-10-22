@@ -16,7 +16,7 @@ find_package(TensorRT REQUIRED)
 #    CUDA Kernels to be compiled with NVCC
 ############################################################################
 add_library(gnuradio-trt-cu STATIC 
-fft.cu 
+window.cu 
 )
 set_target_properties(gnuradio-trt-cu PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
@@ -64,24 +64,6 @@ target_include_directories(gnuradio-trt
 set_target_properties(gnuradio-trt PROPERTIES DEFINE_SYMBOL "gnuradio_trt_EXPORTS")
 target_compile_options(gnuradio-trt PRIVATE -Wno-deprecated-declarations)
 
-
-
-list(APPEND sample_sources
-    logger.cpp
-    sampleOnnxMNIST.cpp
-)
-add_executable(sampleOnnxMNIST ${sample_sources})
-target_include_directories(sampleOnnxMNIST
-    PRIVATE
-    ${CUDA_INCLUDE_DIRS} 
-    ${TensorRT_INCLUDE_DIR}
-)
-target_compile_options(sampleOnnxMNIST PRIVATE -Wno-deprecated-declarations)
-target_link_libraries(sampleOnnxMNIST ${TensorRT_LIBRARY}
-${CUDA_CUDA_LIBRARY}   # CUDA Driver API
-${CUDA_CUDART_LIBRARY} # CUDA Runtime API
-${CUDA_CUFFT_LIBRARIES}
-${nvonnxparser_LIBRARY})
 
 if(APPLE)
     set_target_properties(gnuradio-trt PROPERTIES

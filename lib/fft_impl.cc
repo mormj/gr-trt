@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2020 gr-trt author.
+ * Copyright 2020 Perspecta Labs, Inc.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */

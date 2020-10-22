@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+## RFML training script, patterned after https://github.com/radioML/examples/blob/master/modulation_recognition/RML2016.10a_VTCNN2_example.ipynb
+## Intended to train some simple models and export to ONNX to run through TensorRT
+## Dataset downloaded from here: http://opendata.deepsig.io/datasets/2016.10/RML2016.10a.tar.bz2
 
+
+# In[1]:
 
 import torch
 from torch import nn
@@ -47,12 +51,6 @@ print(X.shape)
 np.random.seed(2019)
 n_examples = X.shape[0]
 n_train = int(round(n_examples * 0.5))
-
-
-# train_idx = np.random.choice(range(0, n_examples), size=n_train, replace=False)
-# test_idx = list(set(range(0, n_examples))-set(train_idx))
-# X_train = X[train_idx]
-# X_test = X[test_idx]
 
 
 # In[5]:
