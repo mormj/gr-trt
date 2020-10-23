@@ -3,7 +3,7 @@ label: fft
 category: "[TensorRT]"
 templates:
   imports: import trt
-  make: trt.fft(${fft_size}, ${forward}, ${window}, ${shift}, ${batch_size}, ${memory_model})
+  make: trt.fft(${fft_size}, ${forward}, ${shift}, ${batch_size}, ${memory_model})
 parameters:
   - id: fft_size
     label: FFT Size
@@ -13,10 +13,6 @@ parameters:
     dtype: enum
     options: ["True", "False"]
     option_labels: [Forward, Reverse]
-  - id: window
-    label: Window
-    dtype: real_vector
-    default: window.blackmanharris(1024)
   - id: shift
     label: Shift
     dtype: enum

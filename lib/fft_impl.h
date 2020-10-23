@@ -21,7 +21,6 @@ class fft_impl : public fft
 private:
     size_t d_fft_size;
     bool d_forward;
-    std::vector<float> d_window;
     bool d_shift;
     size_t d_batch_size;
     memory_model_t d_mem_model;
@@ -33,7 +32,6 @@ private:
 public:
     fft_impl(const size_t fft_size,
                      const bool forward,
-                     const std::vector<float>& window,
                      bool shift = false,
                      const size_t batch_size = 1,
                      const memory_model_t mem_model = memory_model_t::TRADITIONAL);

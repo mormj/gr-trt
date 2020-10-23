@@ -17,13 +17,12 @@ using input_type = gr_complex;
 using output_type = gr_complex;
 fft::sptr fft::make(const size_t fft_size,
                     const bool forward,
-                    const std::vector<float>& window,
                     bool shift,
                     const size_t batch_size,
                     const memory_model_t mem_model)
 {
     return gnuradio::make_block_sptr<fft_impl>(
-        fft_size, forward, window, shift, batch_size, mem_model);
+        fft_size, forward, shift, batch_size, mem_model);
 }
 
 /*
@@ -31,7 +30,6 @@ fft::sptr fft::make(const size_t fft_size,
  */
 fft_impl::fft_impl(const size_t fft_size,
                    const bool forward,
-                   const std::vector<float>& window,
                    bool shift,
                    const size_t batch_size,
                    const memory_model_t mem_model)
@@ -43,7 +41,6 @@ fft_impl::fft_impl(const size_t fft_size,
                                             fft_size * sizeof(output_type))),
       d_fft_size(fft_size),
       d_forward(forward),
-      d_window(window),
       d_shift(shift),
       d_batch_size(batch_size),
       d_mem_model(mem_model)

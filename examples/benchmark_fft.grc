@@ -95,7 +95,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [416, 156.0]
+    coordinate: [440, 180.0]
     rotation: 0
     state: enabled
 - name: blocks_null_sink_0
@@ -112,7 +112,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [484.0, 352]
+    coordinate: [508.0, 384]
     rotation: 270
     state: enabled
 - name: blocks_null_source_0
@@ -131,7 +131,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 132.0]
+    coordinate: [240, 156.0]
     rotation: 0
     state: enabled
 - name: blocks_stream_to_vector_0
@@ -149,7 +149,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [240, 224.0]
+    coordinate: [264, 256.0]
     rotation: 0
     state: disabled
 - name: blocks_vector_source_x_0
@@ -169,7 +169,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 172.0]
+    coordinate: [48, 204.0]
     rotation: 0
     state: disabled
 - name: import_0
@@ -221,7 +221,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [136, 340.0]
+    coordinate: [160, 372.0]
     rotation: 0
     state: true
 - name: snippet_0_0
@@ -238,7 +238,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [136, 276.0]
+    coordinate: [160, 308.0]
     rotation: 0
     state: true
 - name: trt_fft_0
@@ -259,7 +259,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [600, 124.0]
+    coordinate: [624, 148.0]
     rotation: 0
     state: true
 - name: trt_fft_0_0
@@ -280,9 +280,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [872, 124.0]
+    coordinate: [896, 148.0]
     rotation: 0
-    state: bypassed
+    state: enabled
 - name: trt_fft_0_1
   id: trt_fft
   parameters:
@@ -301,9 +301,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [872, 260.0]
+    coordinate: [896, 292.0]
     rotation: 180
-    state: bypassed
+    state: enabled
 - name: trt_fft_0_2
   id: trt_fft
   parameters:
@@ -322,9 +322,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [600, 268.0]
+    coordinate: [624, 292.0]
     rotation: 180
-    state: bypassed
+    state: enabled
 - name: vs1
   id: blocks_vector_sink_x
   parameters:
@@ -338,7 +338,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [424.0, 352]
+    coordinate: [452.0, 384]
     rotation: 270
     state: disabled
 
