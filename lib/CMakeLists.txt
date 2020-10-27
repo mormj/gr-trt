@@ -17,6 +17,7 @@ find_package(TensorRT REQUIRED)
 ############################################################################
 add_library(gnuradio-trt-cu STATIC 
 window.cu 
+passthrough.cu
 )
 set_target_properties(gnuradio-trt-cu PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
@@ -36,7 +37,8 @@ include(GrPlatform) #define LIB_SUFFIX
 list(APPEND trt_sources
     logger.cpp
     infer_impl.cc
-    fft_impl.cc )
+    fft_impl.cc
+    passthrough_impl.cc )
 
 set(trt_sources "${trt_sources}" PARENT_SCOPE)
 if(NOT trt_sources)

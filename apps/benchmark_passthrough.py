@@ -33,40 +33,38 @@ class benchmark_fft(gr.top_block):
         # Variables
         ##################################################
         nsamples = args['samples']
-        fft_size = args['fftsize']
         batch_size = args['batchsize']
-        self.actual_samples = actual_samples = (
-            fft_size * batch_size) * int(nsamples / (fft_size * batch_size))
+        self.actual_samples = actual_samples = (batch_size) * int(nsamples /  batch_size)
         num_blocks = args['nblocks']
         mem_model = args['memmodel']
 
         ##################################################
         # Blocks
         ##################################################
-        fft_blocks = []
+        ptblocks = []
         for i in range(num_blocks):
-            fft_blocks.append(
-                trt.fft(
-                    fft_size, True, False, batch_size, mem_model)
+            ptblocks.append(
+                trt.passthrough(
+                    batch_size, mem_model)
             )
 
         self.blocks_null_source_0 = blocks.null_source(
-            gr.sizeof_gr_complex*fft_size)
+            gr.sizeof_gr_complex*1)
         self.blocks_null_sink_0 = blocks.null_sink(
-            gr.sizeof_gr_complex*fft_size)
+            gr.sizeof_gr_complex*1)
         self.blocks_head_0 = blocks.head(
-            gr.sizeof_gr_complex*fft_size, int(nsamples / fft_size))
+            gr.sizeof_gr_complex*1, actual_samples)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_head_0, 0), (fft_blocks[0], 0))
+        self.connect((self.blocks_head_0, 0), (ptblocks[0], 0))
         self.connect((self.blocks_null_source_0, 0), (self.blocks_head_0, 0))
 
         for i in range(1, num_blocks):
-            self.connect((fft_blocks[i-1], 0), (fft_blocks[i], 0))
+            self.connect((ptblocks[i-1], 0), (ptblocks[i], 0))
 
-        self.connect((fft_blocks[num_blocks-1], 0),
+        self.connect((ptblocks[num_blocks-1], 0),
                      (self.blocks_null_sink_0, 0))
 
 
@@ -74,32 +72,34 @@ def main(top_block_cls=benchmark_fft, options=None):
     if gr.enable_realtime_scheduling() != gr.RT_OK:
         print("Error: failed to enable real-time scheduling.")
 
-    num_samples = 100e6
+    
     dtstr = datetime.datetime.today()
-    results_filename = 'benchmark_fft_results_{:%y%d%m_%H%M%S}.json'.format(
+    results_filename = 'benchmark_passthrough_results_{:%y%d%m_%H%M%S}.json'.format(
         dtstr)
 
     json_output = {}
     res = []
     json_output['params'] = {}
     json_output['results'] = res
+    save_file = True
 
-    # mem_mode_iter = [trt.memory_model_t.TRADITIONAL, trt.memory_model_t.PINNED, trt.memory_model_t.UNIFIED]
-    # num_blocks_iter = [1, 2, 3, 4]
-    # fft_size_iter = [4, 16, 64, 256, 1024]
-    # batch_size_iter = [1, 4, 16, 64]
-
-    # samples:[100000000,] nblocks:[1,2,4] rt_prio:[True,] memmodel:[0,1] batchsize:[1,4,16,64] fftsize:[32,64,256,1024]
-
+    num_samples = 1e9
     mem_model_iter = [0, 1]
-    num_blocks_iter = [1, 2, 4]
-    fft_size_iter = [32, 64, 256, 1024]
-    batch_size_iter = [1, 4, 16, 64]
+    num_blocks_iter = [1,2,4,8]
+    batch_size_iter = [1024*x for x in [1,2,4,8,16,32,64,128,256,1024]]
 
-    for mem_model, num_blocks, fft_size, batch_size in itertools.product(mem_model_iter, num_blocks_iter, fft_size_iter, batch_size_iter):
+    
+    # num_samples = 1e9
+    # mem_model_iter = [0]
+    # num_blocks_iter = [1]
+    # batch_size_iter = [1024*16]
+    # save_file = False
+
+
+    for mem_model, num_blocks, batch_size in itertools.product(mem_model_iter, num_blocks_iter,  batch_size_iter):
 
         args = {'samples': num_samples, 'memmodel': mem_model,
-                'nblocks': num_blocks, 'fftsize': fft_size, 'batchsize': batch_size}
+                'nblocks': num_blocks, 'batchsize': batch_size}
 
         print(args)
 
@@ -129,8 +129,9 @@ def main(top_block_cls=benchmark_fft, options=None):
         print("{} MSamps / sec, {}".format(meas_tput/1e6, endt-startt))
 
         res.append(r)
-        with open(results_filename, 'w') as json_file:
-            json.dump(json_output, json_file)
+        if save_file:
+            with open(results_filename, 'w') as json_file:
+                json.dump(json_output, json_file)
 
 
 if __name__ == '__main__':

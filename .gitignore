@@ -5,3 +5,4 @@ examples/*.py
 **/.vscode
 tmp/
 **/__pycache__
+*results*.json

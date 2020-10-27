@@ -1,0 +1,22 @@
+id: trt_passthrough
+label: passthrough
+category: '[TensorRT]'
+templates:
+  imports: import trt
+  make: trt.passthrough(${batch_size}, ${mem_model})
+parameters:
+- id: batch_size
+  label: Batch_size
+  dtype: int
+- id: mem_model
+  label: Mem_model
+  dtype: raw
+inputs:
+- label: in
+  domain: stream
+  dtype: complex
+outputs:
+- label: out
+  domain: stream
+  dtype: complex
+file_format: 1

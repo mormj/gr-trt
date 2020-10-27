@@ -24,6 +24,7 @@ namespace py = pybind11;
     void bind_memmodel(py::module& m);
     void bind_infer(py::module& m);
     void bind_fft(py::module& m);
+    void bind_passthrough(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -55,5 +56,6 @@ PYBIND11_MODULE(trt_python, m)
     bind_memmodel(m);
     bind_infer(m);
     bind_fft(m);
+    bind_passthrough(m);
     // ) END BINDING_FUNCTION_CALLS
 }
