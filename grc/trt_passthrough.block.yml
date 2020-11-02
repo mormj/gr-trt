@@ -15,8 +15,10 @@ inputs:
 - label: in
   domain: stream
   dtype: complex
+  vlen: ${batch_size}
 outputs:
 - label: out
   domain: stream
   dtype: complex
+  vlen: ${batch_size}
 file_format: 1
