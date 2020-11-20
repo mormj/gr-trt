@@ -10,9 +10,36 @@ Developed to be used as a basis to benchmark improvements in GNU Radio buffering
 
 ## Dependencies
 
-- CUDA Toolkit (tested with 11.2)
-- cuDNN (tested with 11.0)
-- TensorRT (tested with 8.0)
+- CUDA Toolkit (tested with 11.0)
+- cuDNN (tested with 8.0)
+- TensorRT (tested with 7.6.1)
+
+### Installing Dependencies
+
+Installing CUDA drivers can be tricky, so be careful to follow the installation directions of the individual components and test after each step
+
+https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
+
+https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html
+
+https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html
+
+Here are some of the things I had to go through to install on `Ubuntu 20.04` (definitely not an Install Guide):
+
+- Download the nvidia Cuda Toolkit (https://developer.nvidia.com/cuda-toolkit-archive)
+- Remove existing nvidia drivers
+```bash
+sudo apt remove nvidia-driver-450
+sudo apt autoremove
+```
+- Blacklist the nouveau driver (https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-nouveau)
+
+Required booting to a non-graphical shell after this, and running the runfile script from there
+
+- Install the CUDA Toolkit
+- Add bin dir to $PATH in .bashrc
+- Add lib dir to $LD_LIBRARY_PATH in .bashrc
+
 
 ## Building
 
