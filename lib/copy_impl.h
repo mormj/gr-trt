@@ -5,16 +5,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#ifndef INCLUDED_TRT_PASSTHROUGH_IMPL_H
-#define INCLUDED_TRT_PASSTHROUGH_IMPL_H
+#ifndef INCLUDED_TRT_COPY_IMPL_H
+#define INCLUDED_TRT_COPY_IMPL_H
 
-#include <trt/passthrough.h>
+#include <trt/copy.h>
 #include <cuComplex.h>
 
 namespace gr {
 namespace trt {
 
-class passthrough_impl : public passthrough
+class copy_impl : public copy
 {
 private:
     int d_batch_size;
@@ -24,8 +24,8 @@ private:
     cuFloatComplex *d_data;
 
 public:
-    passthrough_impl(int batch_size, memory_model_t mem_model);
-    ~passthrough_impl();
+    copy_impl(int batch_size, memory_model_t mem_model);
+    ~copy_impl();
 
     // Where all the action really happens
     int work(int noutput_items,
@@ -36,4 +36,4 @@ public:
 } // namespace trt
 } // namespace gr
 
-#endif /* INCLUDED_TRT_PASSTHROUGH_IMPL_H */
+#endif /* INCLUDED_TRT_COPY_IMPL_H */

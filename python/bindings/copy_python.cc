@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(passthrough.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(3fd3a77af48a07ba6d261699eea4e11e)                     */
+/* BINDTOOL_HEADER_FILE(copy.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(0f932ca4061dffe3fc40141f48e0dc65)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,23 +23,23 @@
 
 namespace py = pybind11;
 
-#include <trt/passthrough.h>
+#include <trt/copy.h>
 // pydoc.h is automatically generated in the build directory
-#include <passthrough_pydoc.h>
+#include <copy_pydoc.h>
 
-void bind_passthrough(py::module& m)
+void bind_copy(py::module& m)
 {
 
-    using passthrough    = ::gr::trt::passthrough;
+    using copy    = ::gr::trt::copy;
 
 
-    py::class_<passthrough, gr::sync_block, gr::block, gr::basic_block,
-        std::shared_ptr<passthrough>>(m, "passthrough", D(passthrough))
+    py::class_<copy, gr::sync_block, gr::block, gr::basic_block,
+        std::shared_ptr<copy>>(m, "copy", D(copy))
 
-        .def(py::init(&passthrough::make),
+        .def(py::init(&copy::make),
            py::arg("batch_size"),
            py::arg("mem_model"),
-           D(passthrough,make)
+           D(copy,make)
         )
         
 

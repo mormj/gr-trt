@@ -9,5 +9,5 @@ install(FILES
     trt_infer.block.yml
     trt_fft.block.yml
     trt_confusion_matrix.block.yml
-    trt_passthrough.block.yml DESTINATION share/gnuradio/grc/blocks
+    trt_copy.block.yml DESTINATION share/gnuradio/grc/blocks
 )

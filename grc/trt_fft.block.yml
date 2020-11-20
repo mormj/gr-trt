@@ -1,5 +1,5 @@
 id: trt_fft
-label: cuFFT
+label: FFT (CUDA)
 category: "[TensorRT]"
 templates:
   imports: import trt

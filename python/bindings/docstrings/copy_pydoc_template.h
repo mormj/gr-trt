@@ -16,12 +16,12 @@
 
 
  
- static const char *__doc_gr_trt_passthrough = R"doc()doc";
+ static const char *__doc_gr_trt_copy = R"doc()doc";
 
 
- static const char *__doc_gr_trt_passthrough_passthrough = R"doc()doc";
+ static const char *__doc_gr_trt_copy_copy = R"doc()doc";
 
 
- static const char *__doc_gr_trt_passthrough_make = R"doc()doc";
+ static const char *__doc_gr_trt_copy_make = R"doc()doc";
 
   

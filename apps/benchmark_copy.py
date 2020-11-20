@@ -44,7 +44,7 @@ class benchmark_fft(gr.top_block):
         ptblocks = []
         for i in range(num_blocks):
             ptblocks.append(
-                trt.passthrough(
+                trt.copy(
                     batch_size, mem_model)
             )
 
@@ -74,7 +74,7 @@ def main(top_block_cls=benchmark_fft, options=None):
 
     
     dtstr = datetime.datetime.today()
-    results_filename = 'benchmark_passthrough_results_{:%y%d%m_%H%M%S}.json'.format(
+    results_filename = 'benchmark_copy_results_{:%y%d%m_%H%M%S}.json'.format(
         dtstr)
 
     json_output = {}

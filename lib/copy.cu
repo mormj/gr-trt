@@ -1,7 +1,7 @@
 #include <cuComplex.h>
 
 __global__ void
-apply_passthrough_kernel(cuFloatComplex* in, cuFloatComplex* out, int batch_size)
+apply_copy_kernel(cuFloatComplex* in, cuFloatComplex* out, int batch_size)
 {
 
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -12,14 +12,14 @@ apply_passthrough_kernel(cuFloatComplex* in, cuFloatComplex* out, int batch_size
     }
 }
 
-void apply_passthrough(cuFloatComplex* in, cuFloatComplex* out, int grid_size, int block_size)
+void apply_copy(cuFloatComplex* in, cuFloatComplex* out, int grid_size, int block_size)
 {
     int batch_size = block_size * grid_size;
-    apply_passthrough_kernel<<<grid_size, block_size>>>(in, out, batch_size);
+    apply_copy_kernel<<<grid_size, block_size>>>(in, out, batch_size);
 }
 
 void get_block_and_grid(int *minGrid, int *minBlock)
 {
     cudaOccupancyMaxPotentialBlockSize( minGrid, minBlock, 
-        apply_passthrough_kernel, 0, 0);  
+        apply_copy_kernel, 0, 0);  
 }

@@ -13,5 +13,5 @@ install(FILES
     api.h
     infer.h
     fft.h
-    passthrough.h DESTINATION include/trt
+    copy.h DESTINATION include/trt
 )

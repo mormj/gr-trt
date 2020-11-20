@@ -5,7 +5,7 @@ import itertools
 from math import log2
 
 # filename = 'benchmark_fft_results_202310_122759.json'
-filename = '/share/gnuradio/benchmark-dnn/gr-trt/benchmark_passthrough_results_202710_101513.json'
+filename = '/share/gnuradio/benchmark-dnn/gr-trt/benchmark_copy_results_202710_101513.json'
 
 # colors = ['blue','green','red','gray','fuchsia','gold', 'maroon', 'silver']
 colors = plt.get_cmap("tab10")
@@ -22,7 +22,7 @@ mem_models = np.unique([d['memmodel'] for d in data])
 num_blocks = np.unique([d['nblocks'] for d in data])
 
 plt.figure()
-plt.title('Passthrough Blocks')
+plt.title('Copy Blocks')
 plt.xlabel('log2(Batch Size)')
 plt.ylabel('Throughput (MSPS)')
 

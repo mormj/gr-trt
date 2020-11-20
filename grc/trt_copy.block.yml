@@ -1,9 +1,9 @@
-id: trt_passthrough
-label: passthrough
+id: trt_copy
+label: Copy (CUDA)
 category: '[TensorRT]'
 templates:
   imports: import trt
-  make: trt.passthrough(${batch_size}, ${mem_model})
+  make: trt.copy(${batch_size}, ${mem_model})
 parameters:
 - id: batch_size
   label: Batch_size

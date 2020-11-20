@@ -1,5 +1,5 @@
 id: trt_infer
-label: infer
+label: Infer (TensorRT)
 category: '[TensorRT]'
 templates:
   imports: import trt

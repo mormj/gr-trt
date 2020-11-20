@@ -37,7 +37,7 @@ class benchmark_fft(gr.top_block):
         ptblocks = []
         for i in range(num_blocks):
             ptblocks.append(
-                trt.passthrough(
+                trt.copy(
                     veclen, mem_model)
             )
 

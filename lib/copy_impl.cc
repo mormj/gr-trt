@@ -5,32 +5,32 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "passthrough_impl.h"
+#include "copy_impl.h"
 #include <gnuradio/io_signature.h>
 
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <helper_cuda.h>
 
-extern void apply_passthrough(cuFloatComplex* in, cuFloatComplex* out, int grid_size, int block_size);
+extern void apply_copy(cuFloatComplex* in, cuFloatComplex* out, int grid_size, int block_size);
 extern void get_block_and_grid(int *minGrid, int *minBlock);
 namespace gr {
 namespace trt {
 
 using input_type = gr_complex;
 using output_type = gr_complex;
-passthrough::sptr passthrough::make(int batch_size, memory_model_t mem_model)
+copy::sptr copy::make(int batch_size, memory_model_t mem_model)
 {
-    return gnuradio::make_block_sptr<passthrough_impl>(batch_size, mem_model);
+    return gnuradio::make_block_sptr<copy_impl>(batch_size, mem_model);
 }
 
 
 /*
  * The private constructor
  */
-passthrough_impl::passthrough_impl(int batch_size, memory_model_t mem_model)
+copy_impl::copy_impl(int batch_size, memory_model_t mem_model)
     : gr::sync_block(
-          "passthrough",
+          "copy",
           gr::io_signature::make(1, 1 /* min, max nr of inputs */, sizeof(input_type)),
           gr::io_signature::make(1, 1 /* min, max nr of outputs */, sizeof(output_type))),
       d_batch_size(batch_size),
@@ -67,9 +67,9 @@ passthrough_impl::passthrough_impl(int batch_size, memory_model_t mem_model)
 /*
  * Our virtual destructor.
  */
-passthrough_impl::~passthrough_impl() {}
+copy_impl::~copy_impl() {}
 
-int passthrough_impl::work(int noutput_items,
+int copy_impl::work(int noutput_items,
                            gr_vector_const_void_star& input_items,
                            gr_vector_void_star& output_items)
 {
@@ -88,7 +88,7 @@ int passthrough_impl::work(int noutput_items,
             memcpy(d_data, in + s * d_batch_size, mem_size);
         }
 
-        apply_passthrough(d_data, d_data, d_batch_size / d_block_size, d_block_size);
+        apply_copy(d_data, d_data, d_batch_size / d_block_size, d_block_size);
 
 
         cudaDeviceSynchronize();

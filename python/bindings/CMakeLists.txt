@@ -31,7 +31,7 @@ list(APPEND trt_python_files
     memmodel_python.cc
     infer_python.cc
     fft_python.cc
-    passthrough_python.cc python_bindings.cc)
+    copy_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(trt 
    ../..
