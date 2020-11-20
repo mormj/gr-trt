@@ -6,3 +6,4 @@ examples/*.py
 tmp/
 **/__pycache__/
 *results*.json
+data/

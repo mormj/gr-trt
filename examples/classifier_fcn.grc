@@ -135,7 +135,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /share/gnuradio/benchmark-dnn/RML2016.10a_forFCN.test.fc32
+    file: /share/gnuradio/gr39/src/gr-trt/data/RML2016.10a_forFCN.test.fc32
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -157,7 +157,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /share/gnuradio/benchmark-dnn/RML2016.10a_forFCN.test.lbl
+    file: /share/gnuradio/gr39/src/gr-trt/data/RML2016.10a_forFCN.test.lbl
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -440,7 +440,7 @@ blocks:
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/benchmark-dnn/FCNSMALL_1.onnx
+    onnx_pathname: /share/gnuradio/gr39/src/gr-trt/data/FCNSMALL_8.onnx
     type: float
     workspace_size: '1073741824'
   states:
