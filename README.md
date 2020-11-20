@@ -43,7 +43,17 @@ Required booting to a non-graphical shell after this, and running the runfile sc
 
 ## Building
 
+```bash
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DTensorRT_ROOT="/share/opt/TensorRT-7.2.0.14
-make install -j
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DTensorRT_ROOT="/usr/local/TensorRT-7.2.0.14"
+make -j
+make install
+make test
+```
+
+## Benchmarking
+
+The `bench/` directory contains python flowgraph that are intended to be used with [gr-bench](https://github.com/mormj/gr-bench)
+
+Each of these takes in command line parameters for the sensible variables to be modified, and runs the flowgraph under test and produces a printout of the total time elapsed.  
