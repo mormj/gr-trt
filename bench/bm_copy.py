@@ -64,9 +64,9 @@ class benchmark_fft(gr.top_block):
 def main(top_block_cls=benchmark_fft, options=None):
     parser = ArgumentParser(description='Run a flowgraph iterating over parameters for benchmarking')
     parser.add_argument('--rt_prio', help='enable realtime scheduling', action='store_true')
-    parser.add_argument('--samples', type=int, default=1e9)
-    parser.add_argument('--veclen', type=int, default=1)
-    parser.add_argument('--nblocks', type=int, default=1)
+    parser.add_argument('--samples', type=int, default=1e8)
+    parser.add_argument('--veclen', type=int, default=128)
+    parser.add_argument('--nblocks', type=int, default=4)
     parser.add_argument('--memmodel', type=int, default=0)
 
 

@@ -58,6 +58,7 @@ copy_impl::copy_impl(int batch_size, memory_model_t mem_model)
     if (batch_size < d_block_size)
     {
         throw std::runtime_error("batch_size must be a multiple of block size");
+        // d_block_size = batch_size;
     }
 
     set_output_multiple(d_batch_size);
