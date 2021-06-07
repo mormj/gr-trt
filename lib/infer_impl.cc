@@ -76,7 +76,7 @@ bool infer_impl::constructNetwork(SampleUniquePtr<nvinfer1::IBuilder>& builder,
     }
     if (d_int8) {
         config->setFlag(BuilderFlag::kINT8);
-        samplesCommon::setAllTensorScales(network.get(), 127.0f, 127.0f);
+        samplesCommon::setAllDynamicRanges(network.get(), 127.0f, 127.0f);
     }
 
     samplesCommon::enableDLA(builder.get(), config.get(), d_dla_core);

@@ -36,6 +36,7 @@ set(VERSION_ABI   0)
 set(VERSION_PATCH git)
 
 cmake_policy(SET CMP0011 NEW)
+cmake_policy(SET CMP0074 NEW)
 
 # Enable generation of compile_commands.json for code completion engines
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

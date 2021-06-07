@@ -14,7 +14,7 @@ import signal
 from argparse import ArgumentParser
 import time
 import trt
-
+import bench
 
 class benchmark_fft(gr.top_block):
 
@@ -41,10 +41,16 @@ class benchmark_fft(gr.top_block):
                     veclen, mem_model)
             )
 
-        src = blocks.null_source(
-            gr.sizeof_gr_complex*1)
-        snk = blocks.null_sink(
-            gr.sizeof_gr_complex*1)
+        if (args.validate):
+            rollover = 1234
+            input_data = [complex(i,-i) for i in range(rollover+1)]
+            src = blocks.vector_source_c(input_data, True)
+            self.snk = snk = bench.seqval_c(rollover)
+        else:
+            src = blocks.null_source(
+                gr.sizeof_gr_complex*1)
+            snk = blocks.null_sink(
+                gr.sizeof_gr_complex*1)
         hd = blocks.head(
             gr.sizeof_gr_complex*1, actual_samples)
 
@@ -65,10 +71,10 @@ def main(top_block_cls=benchmark_fft, options=None):
     parser = ArgumentParser(description='Run a flowgraph iterating over parameters for benchmarking')
     parser.add_argument('--rt_prio', help='enable realtime scheduling', action='store_true')
     parser.add_argument('--samples', type=int, default=1e8)
-    parser.add_argument('--veclen', type=int, default=128)
+    parser.add_argument('--veclen', type=int, default=1024)
     parser.add_argument('--nblocks', type=int, default=4)
     parser.add_argument('--memmodel', type=int, default=0)
-
+    parser.add_argument('--validate', help='enable data validation', action='store_true')
 
     args = parser.parse_args()
     print(args)
@@ -93,6 +99,8 @@ def main(top_block_cls=benchmark_fft, options=None):
     tb.wait()
     endt = time.time()
 
+    if (args.validate):
+        print(f'[PROFILE_VALID]{tb.snk.valid()}[PROFILE_VALID]')
     print(f'[PROFILE_TIME]{endt-startt}[PROFILE_TIME]')
 
 if __name__ == '__main__':

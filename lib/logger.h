@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,18 @@
 
 #include "logging.h"
 
+class SampleErrorRecorder;
+extern SampleErrorRecorder gRecorder;
 namespace sample
 {
-    extern Logger gLogger;
-    extern LogStreamConsumer gLogVerbose;
-    extern LogStreamConsumer gLogInfo;
-    extern LogStreamConsumer gLogWarning;
-    extern LogStreamConsumer gLogError;
-    extern LogStreamConsumer gLogFatal;
+extern Logger gLogger;
+extern LogStreamConsumer gLogVerbose;
+extern LogStreamConsumer gLogInfo;
+extern LogStreamConsumer gLogWarning;
+extern LogStreamConsumer gLogError;
+extern LogStreamConsumer gLogFatal;
 
-    void setReportableSeverity(Logger::Severity severity);
-}
+void setReportableSeverity(Logger::Severity severity);
+} // namespace sample
 
 #endif // LOGGER_H
