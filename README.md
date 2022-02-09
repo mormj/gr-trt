@@ -10,9 +10,9 @@ Developed to be used as a basis to benchmark improvements in GNU Radio buffering
 
 ## Dependencies
 
-- CUDA Toolkit (tested with 11.0)
-- cuDNN (tested with 8.0)
-- TensorRT (tested with 7.6.1)
+- CUDA Toolkit (tested with 11.5)
+- cuDNN (tested with 8.3.2)
+- TensorRT (tested with 8.2.3)
 
 ### Installing Dependencies
 
@@ -46,7 +46,7 @@ Required booting to a non-graphical shell after this, and running the runfile sc
 ```bash
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DTensorRT_ROOT="/usr/local/TensorRT-7.2.0.14"
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DTensorRT_ROOT="/usr/local/TensorRT-8.2.3.0"
 make -j
 make install
 make test
