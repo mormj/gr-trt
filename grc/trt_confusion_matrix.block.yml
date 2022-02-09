@@ -3,7 +3,7 @@ label: confusion_matrix
 category: "[TensorRT]"
 
 templates:
-  imports: import trt
+  imports: from gnuradio import trt
   # make: trt.confusion_matrix(${class_labels})
   make: |-
     <%

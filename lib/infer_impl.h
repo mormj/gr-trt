@@ -8,7 +8,7 @@
 #ifndef INCLUDED_TRT_INFER_IMPL_H
 #define INCLUDED_TRT_INFER_IMPL_H
 
-#include <trt/infer.h>
+#include <gnuradio/trt/infer.h>
 
 #include <NvInfer.h>
 #include <cuda_runtime_api.h>

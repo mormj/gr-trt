@@ -2,7 +2,7 @@ id: trt_infer
 label: Infer (TensorRT)
 category: '[TensorRT]'
 templates:
-  imports: import trt
+  imports: from gnuradio import trt
   make: trt.infer(${onnx_pathname}, ${type.size}, ${memory_model}, ${workspace_size}, ${dla_core})
 
 parameters:

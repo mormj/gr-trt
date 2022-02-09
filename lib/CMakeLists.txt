@@ -12,33 +12,15 @@
 find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 
-############################################################################
-#    CUDA Kernels to be compiled with NVCC
-############################################################################
-add_library(gnuradio-trt-cu STATIC 
-window.cu 
-copy.cu
-)
-set_target_properties(gnuradio-trt-cu PROPERTIES POSITION_INDEPENDENT_CODE ON)
-set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-
-# set_target_properties(gnuradio-trt-cu PROPERTIES CUDA_ARCHITECTURES 35)
-
-target_compile_options(gnuradio-trt-cu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_75,code=sm_75>)
-
-
-############################################################################
-
-
 ########################################################################
 # Setup library
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
+
 list(APPEND trt_sources
     logger.cpp
     infer_impl.cc
-    fft_impl.cc
-    copy_impl.cc )
+)
 
 set(trt_sources "${trt_sources}" PARENT_SCOPE)
 if(NOT trt_sources)
@@ -47,16 +29,13 @@ if(NOT trt_sources)
 endif(NOT trt_sources)
 
 add_library(gnuradio-trt SHARED ${trt_sources})
-target_link_libraries(gnuradio-trt PUBLIC gnuradio::gnuradio-runtime  
+target_link_libraries(gnuradio-trt gnuradio::gnuradio-runtime
 ${TensorRT_LIBRARY}
 ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
 ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
 ${CUDA_CUFFT_LIBRARIES}
 ${nvonnxparser_LIBRARY}
 )
-target_link_libraries(gnuradio-trt PRIVATE gnuradio-trt-cu
-)
-
 target_include_directories(gnuradio-trt
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
@@ -64,8 +43,6 @@ target_include_directories(gnuradio-trt
     ${TensorRT_INCLUDE_DIR}
   )
 set_target_properties(gnuradio-trt PROPERTIES DEFINE_SYMBOL "gnuradio_trt_EXPORTS")
-target_compile_options(gnuradio-trt PRIVATE -Wno-deprecated-declarations)
-
 
 if(APPLE)
     set_target_properties(gnuradio-trt PROPERTIES
@@ -77,10 +54,7 @@ endif(APPLE)
 # Install built library files
 ########################################################################
 include(GrMiscUtils)
-
-install( TARGETS gnuradio-trt-cu EXPORT gnuradio-trt-cu-export )
 GR_LIBRARY_FOO(gnuradio-trt)
-
 
 ########################################################################
 # Print summary

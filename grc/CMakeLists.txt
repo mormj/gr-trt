@@ -5,9 +5,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
+
 install(FILES
-    trt_infer.block.yml
-    trt_fft.block.yml
-    trt_confusion_matrix.block.yml
-    trt_copy.block.yml DESTINATION share/gnuradio/grc/blocks
+    trt_infer.block.yml 
+    trt_confusion_matrix.block.yml 
+    DESTINATION share/gnuradio/grc/blocks
 )
