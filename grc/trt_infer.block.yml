@@ -3,7 +3,7 @@ label: Infer (TensorRT)
 category: '[TensorRT]'
 templates:
   imports: from gnuradio import trt
-  make: trt.infer(${onnx_pathname}, ${type.size}, ${memory_model}, ${workspace_size}, ${dla_core})
+  make: trt.infer(${onnx_pathname}, ${type.size}, ${workspace_size}, ${dla_core})
 
 parameters:
 - id: type
@@ -18,12 +18,6 @@ parameters:
 - id: onnx_pathname
   label: ONNX Model
   dtype: file_open
-- id: memory_model
-  label: Memory Model
-  dtype: enum
-  default: trt.memory_model_t.TRADITIONAL
-  options: [trt.memory_model_t.TRADITIONAL, trt.memory_model_t.PINNED, trt.memory_model_t.UNIFIED]
-  option_labels: ['Traditional', 'Pinned', 'Unified']
 - id: workspace_size
   label: Workspace Size
   default: 1073741824
@@ -34,11 +28,12 @@ parameters:
   dtype: int
 inputs:
 - label: in
-  domain: stream
+  domain: cuda
   dtype: ${type}
+  
 outputs:
 - label: out
-  domain: stream
+  domain: cuda
   dtype: ${type}
 
 file_format: 1

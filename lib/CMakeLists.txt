@@ -11,6 +11,7 @@
 ########################################################################
 find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
+find_package(gnuradio-cuda)
 
 ########################################################################
 # Setup library
@@ -29,7 +30,7 @@ if(NOT trt_sources)
 endif(NOT trt_sources)
 
 add_library(gnuradio-trt SHARED ${trt_sources})
-target_link_libraries(gnuradio-trt gnuradio::gnuradio-runtime
+target_link_libraries(gnuradio-trt gnuradio::gnuradio-runtime gnuradio::gnuradio-cuda
 ${TensorRT_LIBRARY}
 ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
 ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
