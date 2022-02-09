@@ -35,7 +35,6 @@ public:
      */
     static sptr make(const std::string& onnx_pathname,
                      size_t itemsize,
-                     memory_model_t memory_model = memory_model_t::TRADITIONAL,
                      uint64_t workspace_size = (1 << 30),
                      int dla_core = -1);
 };

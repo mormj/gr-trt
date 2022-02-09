@@ -7,7 +7,7 @@
 
 #include "infer_impl.h"
 #include <gnuradio/io_signature.h>
-
+#include <gnuradio/cuda/cuda_buffer.h>
 
 namespace gr {
 namespace trt {
@@ -16,12 +16,11 @@ using input_type = float;
 using output_type = float;
 infer::sptr infer::make(const std::string& onnx_pathname,
                         size_t itemsize,
-                        memory_model_t memory_model,
                         uint64_t workspace_size,
                         int dla_core)
 {
     return gnuradio::make_block_sptr<infer_impl>(
-        onnx_pathname, itemsize, memory_model, workspace_size, dla_core);
+        onnx_pathname, itemsize, workspace_size, dla_core);
 }
 
 
@@ -30,16 +29,14 @@ infer::sptr infer::make(const std::string& onnx_pathname,
  */
 infer_impl::infer_impl(const std::string& onnx_pathname,
                        size_t itemsize,
-                       memory_model_t memory_model,
                        uint64_t workspace_size,
                        int dla_core)
     : gr::block(
           "infer",
-          gr::io_signature::make(1, 1 /* min, max nr of inputs */, sizeof(input_type)),
-          gr::io_signature::make(1, 1 /* min, max nr of outputs */, sizeof(output_type))),
+          gr::io_signature::make(1, 1, sizeof(input_type), cuda_buffer::type),
+          gr::io_signature::make(1, 1, sizeof(output_type), cuda_buffer::type)),
       d_onnx_pathname(onnx_pathname),
       d_engine(nullptr),
-      d_memory_model(memory_model),
       d_workspace_size(workspace_size),
       d_dla_core(dla_core)
 {
@@ -174,54 +171,8 @@ bool infer_impl::build()
         }
         vol *= samplesCommon::volume(dims);
 
-        void* ptr;
-        switch (d_memory_model) {
-        case memory_model_t::TRADITIONAL:
-            // Input memory will be explicitly set to device memory
+        d_device_bindings.resize(2);
 
-            if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) ==
-                cudaSuccess)
-                return false;
-            if (!cudaMalloc(&ptr, vol * samplesCommon::getElementSize(type)) ==
-                cudaSuccess)
-                return false;
-
-            d_device_bindings.emplace_back(ptr);
-            break;
-
-        case memory_model_t::PINNED:
-
-            // Input memory will be copied into pinned shared memory
-
-            if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) ==
-                cudaSuccess)
-                return false;
-            if (!cudaHostAlloc(&ptr, vol * samplesCommon::getElementSize(type), 0) ==
-                cudaSuccess)
-                return false;
-
-            d_device_bindings.emplace_back(ptr);
-
-            break;
-
-        case memory_model_t::UNIFIED:
-
-            // Use unified memory constructs
-
-            if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) ==
-                cudaSuccess)
-                return false;
-            if (!cudaMallocManaged(&ptr, vol * samplesCommon::getElementSize(type)) ==
-                cudaSuccess)
-                return false;
-
-            d_device_bindings.emplace_back(ptr);
-
-            break;
-
-        default:
-            throw std::runtime_error("Invalid Memory Model Specified");
-        }
     }
     return true;
 }
@@ -246,8 +197,8 @@ int infer_impl::general_work(int noutput_items,
                              gr_vector_void_star& output_items)
 {
     // std::cout << "work" << std::endl;
-    const input_type* in = reinterpret_cast<const input_type*>(input_items[0]);
-    output_type* out = reinterpret_cast<output_type*>(output_items[0]);
+    const input_type* in = static_cast<const input_type*>(input_items[0]);
+    output_type* out = static_cast<output_type*>(output_items[0]);
 
     int in_sz = d_input_vlen;   // * d_batch_size;
     int out_sz = d_output_vlen; // * d_batch_size;
@@ -257,17 +208,8 @@ int infer_impl::general_work(int noutput_items,
 
     for (auto b = 0; b < num_batches; b++) {
 
-        if (d_memory_model == memory_model_t::TRADITIONAL) {
-            cudaMemcpy(d_device_bindings[0],
-                       in + b * in_sz,
-                       in_sz * sizeof(float),
-                       cudaMemcpyHostToDevice);
-        } else {
-            memcpy(d_device_bindings[0],
-                       in + b * in_sz,
-                       in_sz * sizeof(float));
-        }
-
+        d_device_bindings[0] = const_cast<input_type *>(in + b * in_sz);
+        d_device_bindings[1] = const_cast<output_type *>(out + b * out_sz);
 
         bool status = d_context->executeV2(d_device_bindings.data());
         // bool status = d_context->execute(d_batch_size, d_device_bindings.data());
@@ -275,15 +217,6 @@ int infer_impl::general_work(int noutput_items,
             return false;
         }
         cudaDeviceSynchronize();
-
-        if (d_memory_model == memory_model_t::TRADITIONAL) {
-            cudaMemcpy(out + b * out_sz,
-                       d_device_bindings[1],
-                       out_sz * sizeof(float),
-                       cudaMemcpyDeviceToHost);
-        } else {
-            memcpy(out + b * out_sz, d_device_bindings[1], out_sz * sizeof(float));
-        }
     }
 
     // std::cout << "consumed " << ni << std::endl;

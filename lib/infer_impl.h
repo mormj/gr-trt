@@ -37,7 +37,6 @@ private:
     std::string d_onnx_pathname;
     int32_t d_batch_size;
     uint64_t d_workspace_size;
-    memory_model_t d_memory_model;
 
     SampleUniquePtr<nvinfer1::IExecutionContext> d_context;
 
@@ -53,7 +52,7 @@ private:
                           SampleUniquePtr<nvonnxparser::IParser>& parser);
 
 public:
-    infer_impl(const std::string& onnx_pathname, size_t itemsize, memory_model_t memory_model, uint64_t workspace_size, int dla_core);
+    infer_impl(const std::string& onnx_pathname, size_t itemsize, uint64_t workspace_size, int dla_core);
     ~infer_impl();
 
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);

@@ -321,9 +321,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [872, 316.0]
+    coordinate: [816, 204.0]
     rotation: 0
-    state: true
+    state: enabled
 - name: qtgui_time_sink_x_0_0
   id: qtgui_time_sink_x
   parameters:
@@ -445,7 +445,6 @@ blocks:
     comment: ''
     dla_core: '-1'
     maxoutbuf: '0'
-    memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
     onnx_pathname: /share/gnuradio/gr311/src/gr-trt/data/FCNSMALL_8.onnx
     type: float

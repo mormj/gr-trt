@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(infer.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(c91eecd7496a6269d2ad24dd15c13352)                     */
+/* BINDTOOL_HEADER_FILE_HASH(f770081e2dbaad824dfd3dca530e8ae2)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -39,7 +39,6 @@ void bind_infer(py::module& m)
         .def(py::init(&infer::make),
            py::arg("onnx_pathname"),
            py::arg("itemsize"),
-           py::arg("memory_model") = ::gr::trt::memory_model_t::TRADITIONAL,
            py::arg("workspace_size") = (1 << 30),
            py::arg("dla_core") = -1,
            D(infer,make)
