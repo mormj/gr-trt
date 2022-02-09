@@ -23,6 +23,7 @@ options:
     sizing_mode: fixed
     thread_safe_setters: ''
     title: Classifier Test
+    window_size: (1000,1000)
   states:
     bus_sink: false
     bus_source: false
@@ -135,7 +136,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /share/gnuradio/gr39/src/gr-trt/data/RML2016.10a_forFCN.test.fc32
+    file: /share/gnuradio/gr311/src/gr-trt/data/RML2016.10a_forFCN.test.fc32
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -157,7 +158,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /share/gnuradio/gr39/src/gr-trt/data/RML2016.10a_forFCN.test.lbl
+    file: /share/gnuradio/gr311/src/gr-trt/data/RML2016.10a_forFCN.test.lbl
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -308,6 +309,12 @@ blocks:
     samp_rate: samp_rate
     type: float
     update_time: '0.02'
+    x_end_value: '0.0'
+    x_label: '""'
+    x_start_value: '0.0'
+    y_end_value: '0.0'
+    y_label: '""'
+    y_start_value: '0.0'
     zmax: '1'
     zmin: '-1'
   states:
@@ -440,7 +447,7 @@ blocks:
     maxoutbuf: '0'
     memory_model: trt.memory_model_t.PINNED
     minoutbuf: '0'
-    onnx_pathname: /share/gnuradio/gr39/src/gr-trt/data/FCNSMALL_8.onnx
+    onnx_pathname: /share/gnuradio/gr311/src/gr-trt/data/FCNSMALL_8.onnx
     type: float
     workspace_size: '1073741824'
   states:

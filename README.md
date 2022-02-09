@@ -1,6 +1,6 @@
 # gr-trt
 
-GNU Radio wrapping of TensorRT, and other CUDA blocks
+GNU Radio wrapping of TensorRT
 
 Infer block Based on the MNIST ONNX included with TensorRT (sample is included for reference)
 

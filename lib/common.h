@@ -330,7 +330,8 @@ public:
 
 protected:
     HostMemory(std::size_t size, DataType type)
-        : mSize(size)
+        : mData{nullptr}
+        , mSize(size)
         , mType(type)
     {
     }
@@ -343,7 +344,7 @@ template <typename ElemType, DataType dataType>
 class TypedHostMemory : public HostMemory
 {
 public:
-    TypedHostMemory(std::size_t size)
+    explicit TypedHostMemory(std::size_t size)
         : HostMemory(size, dataType)
     {
         mData = new ElemType[size];
@@ -387,6 +388,29 @@ struct InferDeleter
         delete obj;
     }
 };
+
+template <typename T>
+using SampleUniquePtr = std::unique_ptr<T, InferDeleter>;
+
+static auto StreamDeleter = [](cudaStream_t* pStream)
+    {
+        if (pStream)
+        {
+            cudaStreamDestroy(*pStream);
+            delete pStream;
+        }
+    };
+
+inline std::unique_ptr<cudaStream_t, decltype(StreamDeleter)> makeCudaStream()
+{
+    std::unique_ptr<cudaStream_t, decltype(StreamDeleter)> pStream(new cudaStream_t, StreamDeleter);
+    if (cudaStreamCreateWithFlags(pStream.get(), cudaStreamNonBlocking) != cudaSuccess)
+    {
+        pStream.reset(nullptr);
+    }
+
+    return pStream;
+}
 
 template <typename T>
 std::shared_ptr<T> infer_object(T* obj)
@@ -600,17 +624,17 @@ inline void enableDLA(IBuilder* builder, IBuilderConfig* config, int useDLACore,
         }
         config->setDefaultDeviceType(DeviceType::kDLA);
         config->setDLACore(useDLACore);
-        config->setFlag(BuilderFlag::kSTRICT_TYPES);
     }
 }
 
-inline int parseDLA(int argc, char** argv)
+inline int32_t parseDLA(int32_t argc, char** argv)
 {
-    for (int i = 1; i < argc; i++)
+    for (int32_t i = 1; i < argc; i++)
     {
-        std::string arg(argv[i]);
         if (strncmp(argv[i], "--useDLACore=", 13) == 0)
+        {
             return std::stoi(argv[i] + 13);
+        }
     }
     return -1;
 }
@@ -811,7 +835,7 @@ protected:
 class GpuTimer : public TimerBase
 {
 public:
-    GpuTimer(cudaStream_t stream)
+    explicit GpuTimer(cudaStream_t stream)
         : mStream(stream)
     {
         CHECK(cudaEventCreate(&mStart));
@@ -902,7 +926,16 @@ inline void loadLibrary(const std::string& path)
 #ifdef _MSC_VER
     void* handle = LoadLibrary(path.c_str());
 #else
-    void* handle = dlopen(path.c_str(), RTLD_LAZY);
+    int32_t flags{RTLD_LAZY};
+#if ENABLE_ASAN
+    // https://github.com/google/sanitizers/issues/89
+    // asan doesn't handle module unloading correctly and there are no plans on doing
+    // so. In order to get proper stack traces, don't delete the shared library on
+    // close so that asan can resolve the symbols correctly.
+    flags |= RTLD_NODELETE;
+#endif // ENABLE_ASAN
+
+    void* handle = dlopen(path.c_str(), flags);
 #endif
     if (handle == nullptr)
     {
@@ -929,8 +962,27 @@ inline int32_t getSMVersion()
 inline bool isSMSafe()
 {
     const int32_t smVersion = getSMVersion();
-    return smVersion == 0x0700 || smVersion == 0x0702 || smVersion == 0x0705;
+    return smVersion == 0x0700 || smVersion == 0x0702 || smVersion == 0x0705 ||
+           smVersion == 0x0800 || smVersion == 0x0806;
 }
+
+inline bool isDataTypeSupported(DataType dataType)
+{
+    auto builder = SampleUniquePtr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(sample::gLogger.getTRTLogger()));
+    if (!builder)
+    {
+        return false;
+    }
+
+    if ((dataType == DataType::kINT8 && !builder->platformHasFastInt8())
+        || (dataType == DataType::kHALF && !builder->platformHasFastFp16()))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace samplesCommon
 
 inline std::ostream& operator<<(std::ostream& os, const nvinfer1::Dims& dims)
